@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, selectinload
 from typing import List
 
 from schemas.project import ProjectResponse
@@ -16,8 +16,8 @@ def get_projects(db: Session = Depends(get_db)):
     projects = (
         db.query(Project)
         .options(
-            joinedload(Project.components),
-            joinedload(Project.metrics)
+            selectinload(Project.components),
+            selectinload(Project.metrics)
         )
         .all()
     )
@@ -30,8 +30,8 @@ def get_project_by_slug(slug: str, db: Session = Depends(get_db)):
     project = (
         db.query(Project)
         .options(
-            joinedload(Project.components),
-            joinedload(Project.metrics)
+            selectinload(Project.components),
+            selectinload(Project.metrics)
         )
         .filter(Project.slug == slug)
         .first()
