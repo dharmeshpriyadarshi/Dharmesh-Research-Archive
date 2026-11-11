@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List
 
 from schemas.project import ProjectResponse
@@ -12,15 +12,30 @@ router = APIRouter()
 
 @router.get("/", response_model=List[ProjectResponse])
 def get_projects(db: Session = Depends(get_db)):
-    """Retrieve all portfolio projects with their components and metrics."""
-    projects = db.query(Project).all()
+    """Retrieve all portfolio projects with optimized eager loading."""
+    projects = (
+        db.query(Project)
+        .options(
+            joinedload(Project.components),
+            joinedload(Project.metrics)
+        )
+        .all()
+    )
     return projects
 
 
 @router.get("/{slug}", response_model=ProjectResponse)
 def get_project_by_slug(slug: str, db: Session = Depends(get_db)):
-    """Retrieve a specific project by its routing slug."""
-    project = db.query(Project).filter(Project.slug == slug).first()
+    """Retrieve a specific project by its routing slug with eager loading."""
+    project = (
+        db.query(Project)
+        .options(
+            joinedload(Project.components),
+            joinedload(Project.metrics)
+        )
+        .filter(Project.slug == slug)
+        .first()
+    )
 
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
