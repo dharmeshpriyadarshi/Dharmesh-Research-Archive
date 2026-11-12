@@ -1,12 +1,15 @@
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# core/config.py
-from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Dharmesh Research Archive API"
     DATABASE_URL: str
-    
-    class Config:
-        env_file = ".env"
-        
+    FRONTEND_ORIGIN: str = "http://localhost:3000"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
+
+
 settings = Settings()

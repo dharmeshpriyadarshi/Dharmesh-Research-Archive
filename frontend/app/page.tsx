@@ -27,7 +27,7 @@ interface Project {
 
 async function getProjects(): Promise<Project[]> {
   const apiUrl =
-    process.env.API_URL ?? "http://127.0.0.1:8000";
+    process.env.BACKEND_API_URL || "http://127.0.0.1:8000";
 
   const response = await fetch(`${apiUrl}/api/projects/`, {
     cache: "no-store",

@@ -28,7 +28,8 @@ interface PageProps {
 }
 
 async function getProjectBySlug(slug: string): Promise<Project | null> {
-  const apiUrl = process.env.API_URL ?? "http://127.0.0.1:8000";
+  const apiUrl =
+    process.env.BACKEND_API_URL || "http://127.0.0.1:8000";
 
   const response = await fetch(
     `${apiUrl}/api/projects/${encodeURIComponent(slug)}`,
