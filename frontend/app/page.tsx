@@ -1,3 +1,4 @@
+import Link from "next/link";
 
 interface TechComponent {
   id: number;
@@ -110,7 +111,12 @@ export default async function PortfolioRoot() {
                 </div>
 
                 <h3 className="mb-4 text-2xl">
-                  {project.title}
+                  <Link
+                    href={`/research/${project.slug}`}
+                    className="underline decoration-gray-400 underline-offset-4 transition-colors hover:decoration-black"
+                  >
+                    {project.title}
+                  </Link>
                 </h3>
 
                 <p className="mb-5 max-w-3xl text-gray-700">

@@ -27,6 +27,7 @@ class ProjectResponse(BaseModel):
     title: str
     slug: str
     abstract: str
+    content: str
     repository_url: Optional[str] = None
     status: str
     created_at: datetime

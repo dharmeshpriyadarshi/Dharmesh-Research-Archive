@@ -1,5 +1,6 @@
 
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
 
 :root {
   --background: #ffffff;
@@ -62,4 +63,71 @@ th, td {
   body {
     padding: 28px 18px;
   }
+}
+
+
+/* Academic research article styling */
+.research-content {
+  color: #222222;
+  font-size: 16px;
+  line-height: 1.85;
+  overflow-wrap: break-word;
+}
+
+.research-content h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #d1d1d1;
+  font-size: 1.6rem;
+}
+
+.research-content h3 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+}
+
+.research-content p {
+  margin: 1rem 0;
+}
+
+.research-content ul,
+.research-content ol {
+  margin: 1rem 0;
+  padding-left: 1.75rem;
+}
+
+.research-content ul {
+  list-style-type: disc;
+}
+
+.research-content ol {
+  list-style-type: decimal;
+}
+
+.research-content li {
+  margin: 0.4rem 0;
+}
+
+.research-content code {
+  font-family: "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+.research-content .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 2rem 0;
+  padding: 1rem;
+  border: 1px solid #d1d1d1;
+  background: #fafafa;
+  text-align: center;
+}
+
+.research-content blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid #111111;
+  color: #555555;
 }

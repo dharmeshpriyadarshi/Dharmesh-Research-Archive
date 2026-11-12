@@ -15,6 +15,11 @@ class Project(Base):
     title = Column(String(255), nullable=False)
     slug = Column(String(255), unique=True, index=True, nullable=False)
     abstract = Column(Text, nullable=False)
+    content = Column(
+        Text,
+        nullable=False,
+        server_default="Detailed methodology pending."
+    )
     repository_url = Column(String(255), nullable=True)
     status = Column(Enum("In Progress", "Completed", "Deployed", name="project_status"), nullable=False)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

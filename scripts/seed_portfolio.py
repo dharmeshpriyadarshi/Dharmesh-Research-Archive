@@ -30,6 +30,7 @@ def seed_database(db: Session):
 
     print("Seeding DialectAlign...")
 
+
     dialect_align = Project(
         title="DialectAlign: Low-Resource Civic NLP",
         slug="dialect-align",
@@ -38,9 +39,52 @@ def seed_database(db: Session):
             "Bhojpuri and Maithili dialects. Features PII redaction "
             "protocols, Devanagari text normalization, and lexical standardizers."
         ),
+        content=r"""
+## Methodology
+
+DialectAlign investigates cross-lingual civic grievance classification
+for low-resource Bhojpuri and Maithili language varieties.
+
+The preprocessing pipeline focuses on deterministic text normalization,
+including Devanagari punctuation handling, lexical standardization, and
+PII redaction protocols.
+
+### Mathematical Foundation
+
+Term Frequencyâ€“Inverse Document Frequency (TF-IDF) provides a numerical
+representation of textual features by weighting terms according to
+their frequency within a document and their distribution across the corpus.
+
+The standard formulation is:
+
+$$
+\text{TF-IDF}(t,d) =
+\text{TF}(t,d) \times
+\log\left(\frac{N}{\text{DF}(t)}\right)
+$$
+
+Where:
+
+- \(t\) represents a term.
+- \(d\) represents a document.
+- \(N\) represents the total number of documents.
+- \(\text{DF}(t)\) represents the number of documents containing term \(t\).
+
+### Data Analysis and Evaluation
+
+Exploratory data analysis examines the distribution of civic grievance
+categories, including infrastructure, utilities, and sanitation.
+
+The evaluation protocol uses an 80/20 training and testing partition
+to separate model development from evaluation.
+
+The implementation also includes unit tests for validating core
+preprocessing and utility functions.
+""",
         repository_url="https://github.com/dharmeshpriyadarshi/DialectAlign",
         status="In Progress"
     )
+
 
     dialect_align.components = [
         TechComponent(category="Language", name="Python", version="3.11.9"),
