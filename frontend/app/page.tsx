@@ -1,4 +1,5 @@
-import Link from "next/link";
+
+import VoxelCard from "./components/VoxelCard";
 
 interface TechComponent {
   id: number;
@@ -39,18 +40,6 @@ async function getProjects(): Promise<Project[]> {
   }
 
   return response.json();
-}
-
-function MetricValue({ value }: { value: unknown }) {
-  if (value === null || value === undefined) {
-    return <span>—</span>;
-  }
-
-  if (typeof value === "object") {
-    return <code>{JSON.stringify(value)}</code>;
-  }
-
-  return <span>{String(value)}</span>;
 }
 
 export default async function PortfolioRoot() {
@@ -94,109 +83,22 @@ export default async function PortfolioRoot() {
             No research artifacts currently indexed.
           </p>
         ) : (
-          <div className="space-y-12">
-            {projects.map((project, index) => (
-              <article
+          <section className="max-w-6xl mx-auto isometric-grid">
+            {projects.map((project) => (
+              <VoxelCard
                 key={project.id}
-                className="border-b border-gray-300 pb-10"
-              >
-                <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-                  <p className="font-mono text-xs text-gray-500">
-                    PROJECT {String(index + 1).padStart(2, "0")}
-                  </p>
-
-                  <span className="border border-gray-400 px-2 py-1 font-mono text-[10px] uppercase">
-                    {project.status}
-                  </span>
-                </div>
-
-                <h3 className="mb-4 text-2xl">
-                  <Link
-                    href={`/research/${project.slug}`}
-                    className="underline decoration-gray-400 underline-offset-4 transition-colors hover:decoration-black"
-                  >
-                    {project.title}
-                  </Link>
-                </h3>
-
-                <p className="mb-5 max-w-3xl text-gray-700">
-                  {project.abstract}
-                </p>
-
-                {project.repository_url && (
-                  <a
-                    href={project.repository_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block font-mono text-xs underline underline-offset-4"
-                  >
-                    [ Source Code Repository ]
-                  </a>
-                )}
-
-                <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
-                  <section>
-                    <h4 className="mb-3 border-b border-black pb-2 font-mono text-xs uppercase tracking-wider">
-                      Technical Components
-                    </h4>
-
-                    <ul className="space-y-2">
-                      {project.components.map((component) => (
-                        <li
-                          key={component.id}
-                          className="flex justify-between gap-3 text-sm"
-                        >
-                          <span>{component.name}</span>
-                          <span className="font-mono text-xs text-gray-500">
-                            {component.version ?? "—"}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-
-                  <section>
-                    <h4 className="mb-3 border-b border-black pb-2 font-mono text-xs uppercase tracking-wider">
-                      Research Metrics
-                    </h4>
-
-                    <div className="space-y-5">
-                      {project.metrics.map((metric) => (
-                        <div key={metric.id}>
-                          <p className="mb-2 text-sm font-bold">
-                            {metric.metric_type}
-                          </p>
-
-                          <table className="my-0">
-                            <tbody>
-                              {Object.entries(metric.metric_data).map(
-                                ([key, value]) => (
-                                  <tr key={key}>
-                                    <td className="break-all text-gray-600">
-                                      {key.replaceAll("_", " ")}
-                                    </td>
-                                    <td className="text-right font-mono">
-                                      <MetricValue value={value} />
-                                    </td>
-                                  </tr>
-                                )
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                </div>
-              </article>
+                project={project}
+              />
             ))}
-          </div>
+          </section>
         )}
       </section>
 
       <footer className="mt-16 border-t-2 border-black pt-5 font-mono text-xs text-gray-500">
         <p>DHARMESH PRIYADARSHI — RESEARCH ARCHIVE</p>
-        <p className="mt-2">Built with FastAPI · PostgreSQL · Next.js</p>
+        <p className="mt-2">
+          Built with FastAPI · PostgreSQL · Next.js
+        </p>
       </footer>
     </main>
   );

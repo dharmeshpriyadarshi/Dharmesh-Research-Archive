@@ -39,48 +39,46 @@ def seed_database(db: Session):
             "Bhojpuri and Maithili dialects. Features PII redaction "
             "protocols, Devanagari text normalization, and lexical standardizers."
         ),
-        content=r"""
-## Methodology
+        content="""
+## Experimental Methodology
 
-DialectAlign investigates cross-lingual civic grievance classification
-for low-resource Bhojpuri and Maithili language varieties.
+DialectAlign is a low-resource NLP workflow prototype for classifying short civic grievances in Bhojpuri and Maithili. The current dataset is a seven-record synthetic sample used to validate the preprocessing and classification workflow. It is not a representative CPGRAMS dataset.
 
-The preprocessing pipeline focuses on deterministic text normalization,
-including Devanagari punctuation handling, lexical standardization, and
-PII redaction protocols.
+### Exploratory Data Analysis
 
-### Mathematical Foundation
+The verified sample contains seven records across three grievance categories:
 
-Term Frequencyâ€“Inverse Document Frequency (TF-IDF) provides a numerical
-representation of textual features by weighting terms according to
-their frequency within a document and their distribution across the corpus.
+| Category | Records | Share |
+|---|---:|---:|
+| Infrastructure | 3 | 42.857% |
+| Utility | 3 | 42.857% |
+| Sanitation | 1 | 14.286% |
+| **Total** | **7** | **100%** |
 
-The standard formulation is:
+The 95th-percentile grievance length in the recorded pilot metrics is 3.7 words. Given the small synthetic sample, this should be interpreted as a descriptive pilot statistic rather than a population-level estimate.
 
-$$
-\text{TF-IDF}(t,d) =
-\text{TF}(t,d) \times
-\log\left(\frac{N}{\text{DF}(t)}\right)
-$$
+### Preprocessing and Label Encoding
 
-Where:
+The `TextNormalizer` was applied to both training and test text. The dataset was split into five training records and two test records.
 
-- \(t\) represents a term.
-- \(d\) represents a document.
-- \(N\) represents the total number of documents.
-- \(\text{DF}(t)\) represents the number of documents containing term \(t\).
+The `LabelEncoder` was fitted only on the training labels, preventing the test labels from influencing label mapping. The resulting class mapping was:
 
-### Data Analysis and Evaluation
+- Infrastructure → 0
+- Sanitation → 1
+- Utility → 2
 
-Exploratory data analysis examines the distribution of civic grievance
-categories, including infrastructure, utilities, and sanitation.
+The encoded test labels were `[0, 2]`.
 
-The evaluation protocol uses an 80/20 training and testing partition
-to separate model development from evaluation.
+### Class Imbalance and Evaluation Considerations
 
-The implementation also includes unit tests for validating core
-preprocessing and utility functions.
-""",
+The sample is imbalanced, with Sanitation represented by only one record. This is too small a dataset for meaningful claims about model generalization or for drawing conclusions about real-world class prevalence.
+
+Macro F1-score and per-class precision and recall are appropriate evaluation measures to consider as the dataset grows. Class weighting or resampling may be evaluated using training data only.
+
+### Current Experimental Scope
+
+The verified work establishes a preprocessing, splitting, and label-encoding workflow. TF-IDF feature extraction, model performance, and mitigation of class imbalance should be documented only after their implementation and results have been independently verified.
+        """,
         repository_url="https://github.com/dharmeshpriyadarshi/DialectAlign",
         status="In Progress"
     )
@@ -118,6 +116,28 @@ preprocessing and utility functions.
             "functionality by constructing interactive personalized digital "
             "rooms utilizing OAuth 2.0 authorization code flows."
         ),
+        content="""
+## Backend Architecture
+
+OnTopOfSpotify is a backend-focused project for aggregating Spotify data and managing application-owned playlist information.
+
+### Authentication: OAuth 2.0
+
+The authentication design uses Spotify's OAuth 2.0 Authorization Code flow.
+
+1. The application initiates the authorization process.
+2. A state value is used to protect the authorization flow against cross-site request forgery.
+3. The state value is maintained using an HttpOnly cookie.
+4. The authorization callback validates the returned state before proceeding with the token exchange.
+
+### Security Considerations
+
+The state-cookie mechanism protects the authorization callback from accepting an unsolicited or mismatched OAuth response. Access and refresh token handling must remain server-side; credentials must not be exposed to frontend code or committed to version control.
+
+### Current Scope
+
+The documented implementation covers the OAuth authorization-code flow and state-cookie CSRF protection. Further Spotify API integration, persistent token management, playlist synchronization, and database-backed user workflows should be documented as they are implemented and verified.
+        """,
         repository_url="https://github.com/dharmeshpriyadarshi/ontopofspotify",
         status="In Progress"
     )
