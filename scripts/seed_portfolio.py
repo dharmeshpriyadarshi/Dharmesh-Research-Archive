@@ -14,7 +14,7 @@ from db.models import Project, TechComponent, ProjectMetric
 def seed_database(db: Session):
     # Remove only the projects managed by this seed script.
     # ORM delete operations also apply the configured relationship cascades.
-    seed_slugs = ["dialect-align", "on-top-of-spotify"]
+    seed_slugs = ["dialect-align", "on-top-of-spotify", "veridian-aqi"]
 
     existing_projects = (
         db.query(Project)
@@ -158,7 +158,69 @@ The documented implementation covers the OAuth authorization-code flow and state
         )
     ]
 
-    db.add_all([dialect_align, spotify_cms])
+
+    print("Seeding Veridian...")
+
+    veridian = Project(
+        title="Veridian: Heterogeneous Stacking for AQI Forecasting",
+        slug="veridian-aqi",
+        abstract=(
+            "A leakage-safe machine learning framework for city-level "
+            "Air Quality Index forecasting across six Indian cities, "
+            "comparing Bi-LSTM, Bi-GRU, and TCN ensembles against "
+            "tree-based baselines."
+        ),
+        content="""
+## Experimental Methodology
+
+This study evaluates two heterogeneous stacked ensembles across six Indian cities: Delhi, Gurugram, Bengaluru, Chennai, Hyderabad, and Patna.
+
+### Pipeline Architecture and Leakage Prevention
+
+The forecasting pipeline integrates autoregressive, lag-based, and meteorological features into a 65-dimensional tabular representation, alongside a 14-step historical sequence tensor.
+
+Chronological separation was enforced between training (N=5,203), validation (N=870), and held-out test (N=1,770) partitions. Out-of-fold predictions were generated temporally to train the Extra Trees meta-learner.
+
+### Heterogeneous Stacking
+
+Two architectures were evaluated:
+
+1. SE-1: XGBoost + Bi-LSTM + TCN → Extra Trees
+2. SE-2: XGBoost + Bi-GRU + TCN → Extra Trees
+
+### Performance Analysis
+
+The standalone XGBoost model outperformed both heterogeneous stacking architectures. This demonstrates that combining multiple model families does not automatically improve predictive performance.
+
+RMSE penalizes larger prediction errors more heavily than MAE, making it useful for evaluating the impact of substantial AQI prediction errors.
+        """,
+        repository_url="https://github.com/dharmeshpriyadarshi/veridian-and-direction",
+        status="Completed"
+    )
+
+    veridian.components = [
+        TechComponent(category="Framework", name="PyTorch", version="latest"),
+        TechComponent(category="Framework", name="XGBoost", version="latest"),
+        TechComponent(category="Framework", name="Scikit-Learn", version="latest")
+    ]
+
+    veridian.metrics = [
+        ProjectMetric(
+            metric_type="Standalone_Benchmark",
+            metric_data={"model": "XGBoost", "RMSE": 28.10, "R2": 0.9225, "MAE": 18.51}
+        ),
+        ProjectMetric(
+            metric_type="SE1_Performance",
+            metric_data={"model": "Bi-LSTM Stack", "RMSE": 30.81, "R2": 0.9068, "MAE": 21.79}
+        ),
+        ProjectMetric(
+            metric_type="SE2_Performance",
+            metric_data={"model": "Bi-GRU Stack", "RMSE": 42.53, "R2": 0.8224, "MAE": 34.60}
+        )
+    ]
+
+
+    db.add_all([dialect_align, spotify_cms, veridian])
     db.commit()
 
     print("Database seeding completed successfully.")
