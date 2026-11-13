@@ -15,3 +15,5 @@ __pycache__/
 
 # Alembic
 alembic/__pycache__/
+.neon
+node_modules/
