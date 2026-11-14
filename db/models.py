@@ -28,6 +28,18 @@ class Project(Base):
     components = relationship("TechComponent", back_populates="project", cascade="all, delete-orphan")
     metrics = relationship("ProjectMetric", back_populates="project", cascade="all, delete-orphan")
 
+class ResearchPaper(Base):
+    __tablename__ = "research_papers"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    title = Column(String(255), nullable=False)
+    slug = Column(String(255), unique=True, index=True, nullable=False)
+    abstract = Column(Text, nullable=False)
+    journal_or_conference = Column(String(255), nullable=True)
+    publication_date = Column(DateTime(timezone=True), nullable=True)
+    pdf_url = Column(Text, nullable=True)
+    doi = Column(String(100), nullable=True)
+
 class TechComponent(Base):
     __tablename__ = "tech_components"
 

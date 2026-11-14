@@ -1,5 +1,6 @@
 
 import VoxelCard from "./components/VoxelCard";
+import ResearchPaperCard from "./components/ResearchPaperCard";
 
 interface TechComponent {
   id: number;
@@ -25,6 +26,17 @@ interface Project {
   metrics: ProjectMetric[];
 }
 
+interface ResearchPaper {
+  id: string;
+  title: string;
+  slug: string;
+  abstract: string;
+  journal_or_conference?: string | null;
+  publication_date?: string | null;
+  pdf_url?: string | null;
+  doi?: string | null;
+}
+
 async function getProjects(): Promise<Project[]> {
   const apiUrl =
     process.env.BACKEND_API_URL || "http://127.0.0.1:8000";
@@ -34,16 +46,47 @@ async function getProjects(): Promise<Project[]> {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Failed to fetch projects: ${response.status}`
-    );
+    throw new Error(`Failed to fetch projects: ${response.status}`);
   }
 
   return response.json();
 }
 
+async function getResearchPapers(): Promise<ResearchPaper[] | null> {
+  const apiUrl =
+    process.env.BACKEND_API_URL || "http://127.0.0.1:8000";
+
+  try {
+    const response = await fetch(`${apiUrl}/api/research-papers/`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return response.json();
+  } catch {
+    return null;
+  }
+}
+
 export default async function PortfolioRoot() {
-  const projects = await getProjects();
+  const [projects, papers] = await Promise.all([
+    getProjects(),
+    getResearchPapers(),
+  ]);
+
+  const skills = Array.from(
+    new Map(
+      projects.flatMap((project) =>
+        project.components.map(
+          (component) =>
+            [component.name.toLowerCase(), component.name] as const
+        )
+      )
+    ).values()
+  ).sort((a, b) => a.localeCompare(b));
 
   return (
     <main>
@@ -67,10 +110,10 @@ export default async function PortfolioRoot() {
         </p>
       </header>
 
-      <section>
+      <section className="mb-20">
         <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
           <h2 className="text-xl uppercase tracking-wide">
-            Selected Research & Architectures
+            Software Projects
           </h2>
 
           <span className="font-mono text-xs">
@@ -80,24 +123,82 @@ export default async function PortfolioRoot() {
 
         {projects.length === 0 ? (
           <p className="py-8 text-gray-600">
-            No research artifacts currently indexed.
+            No software projects currently indexed.
           </p>
         ) : (
-          <section className="max-w-6xl mx-auto isometric-grid">
+          <div className="horizontal-matrix no-scrollbar">
             {projects.map((project) => (
-              <VoxelCard
-                key={project.id}
-                project={project}
-              />
+              <div className="snap-voxel" key={project.id}>
+                <VoxelCard project={project} />
+              </div>
             ))}
-          </section>
+          </div>
+        )}
+      </section>
+
+      <section className="mb-20">
+        <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
+          <h2 className="text-xl uppercase tracking-wide">
+            Academic Publications
+          </h2>
+
+          <span className="font-mono text-xs">
+            {papers === null
+              ? "UNAVAILABLE"
+              : `${papers.length.toString().padStart(2, "0")} ENTRIES`}
+          </span>
+        </div>
+
+        {papers === null ? (
+          <p className="py-8 text-gray-600">
+            Publication records could not be retrieved.
+          </p>
+        ) : papers.length === 0 ? (
+          <p className="py-8 text-gray-600">
+            No academic publications currently indexed.
+          </p>
+        ) : (
+          <div className="horizontal-matrix no-scrollbar">
+            {papers.map((paper) => (
+              <ResearchPaperCard key={paper.id} paper={paper} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="mb-20">
+        <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
+          <h2 className="text-xl uppercase tracking-wide">
+            Technical Skills
+          </h2>
+
+          <span className="font-mono text-xs">
+            {skills.length.toString().padStart(2, "0")} TECHNOLOGIES
+          </span>
+        </div>
+
+        {skills.length === 0 ? (
+          <p className="py-8 text-gray-600">
+            No technologies currently indexed.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                className="border border-black bg-white px-4 py-2 font-mono text-sm"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
         )}
       </section>
 
       <footer className="mt-16 border-t-2 border-black pt-5 font-mono text-xs text-gray-500">
-        <p>DHARMESH PRIYADARSHI — RESEARCH ARCHIVE</p>
+        <p>DHARMESH PRIYADARSHI - RESEARCH ARCHIVE</p>
         <p className="mt-2">
-          Built with FastAPI · PostgreSQL · Next.js
+          Built with FastAPI | PostgreSQL | Next.js
         </p>
       </footer>
     </main>

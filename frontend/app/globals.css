@@ -360,3 +360,31 @@ th, td {
     }
   }
 }
+
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .horizontal-matrix {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 4rem;
+    padding: 4rem 2rem;
+    perspective: 2000px;
+  }
+
+  .snap-voxel {
+    flex: 0 0 min(320px, calc(100vw - 5rem));
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+}

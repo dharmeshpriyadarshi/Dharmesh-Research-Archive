@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routes import projects
 from core.config import settings
 
+from api.routes import research_papers
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -33,6 +34,11 @@ app.include_router(
     tags=["Projects"]
 )
 
+app.include_router(
+    research_papers.router,
+    prefix="/api/research-papers",
+    tags=["Research Papers"]
+)
 
 @app.get("/health")
 def health_check():
