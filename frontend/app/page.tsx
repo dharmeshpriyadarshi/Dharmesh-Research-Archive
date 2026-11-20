@@ -79,7 +79,7 @@ export default async function PortfolioRoot() {
 
   const skills = Array.from(
     new Map(
-      projects.flatMap((project) =>
+      projects.filter((project) => project.status !== "Planned").flatMap((project) =>
         project.components.map(
           (component) =>
             [component.name.toLowerCase(), component.name] as const

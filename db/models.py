@@ -21,7 +21,7 @@ class Project(Base):
         server_default="Detailed methodology pending."
     )
     repository_url = Column(String(255), nullable=True)
-    status = Column(Enum("In Progress", "Completed", "Deployed", name="project_status"), nullable=False)
+    status = Column(Enum("In Progress", "Completed", "Deployed", "Planned", name="project_status"), nullable=False)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

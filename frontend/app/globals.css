@@ -542,3 +542,24 @@ th, td {
     }
   }
 }
+
+
+/* Planned research cards */
+
+.voxel-card-planned .voxel-card-content {
+  background: #fafafa;
+}
+
+.voxel-card-planned .voxel-status {
+  background: #e3e3e3;
+  color: #424242;
+  border: 1px solid #bcbcbc;
+}
+
+.voxel-card-planned .voxel-title {
+  color: #333333;
+}
+
+.voxel-card-planned .voxel-open {
+  color: #444444;
+}
