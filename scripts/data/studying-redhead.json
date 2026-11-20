@@ -1,0 +1,18 @@
+{
+    "title":  "Studying Redhead: Unsupervised Anomaly Detection in Martian Remote Sensing",
+    "slug":  "studying-redhead",
+    "status":  "In Progress",
+    "abstract":  "A scientific computing framework investigating whether statistical and unsupervised machine learning methods can identify interpretable unusual surface patterns in Martian orbital observations. The project distinguishes observed surface characteristics from observational artefacts and model-generated interpretations.",
+    "content":  "## Research Motivation\n\nPlanetary remote sensing produces extensive observations whose interpretation requires reliable data processing and scientifically defensible computational methods.\n\n## Research Question\n\nTo what extent can statistical and unsupervised machine learning methods identify unusual Martian surface patterns while distinguishing genuine surface characteristics from observational and preprocessing artefacts?\n\n## Current Engineering Progress\n\nThe existing infrastructure includes modular raster ingestion, geospatial coordinate transformations, raster tiling, normalization, exploratory spatial data analysis, logging, exception handling and automated pipeline orchestration.\n\nThe development handoff reports 41 passing automated tests, 87% combined code coverage and three successful pipeline executions. These are engineering validation results, not planetary research findings. Authentic Martian observations have not yet been integrated.\n\n## Planned Scientific Datasets\n\n- CTX orbital imagery for morphological and textural analysis.\n- MOLA elevation products for regional topographic context.\n- Published Martian geological maps and crater catalogues for interpretation and proxy evaluation.\n- Optional CRISM products for future spectral investigations.\n\n## Proposed Experimental Methodology\n\nBegin with a bounded Martian study region. Statistical and classical image-processing baselines will precede investigation of Isolation Forest, PCA and convolutional or variational autoencoders. Multimodal fusion requires scientifically appropriate spatial alignment.\n\n## Evaluation Protocol\n\nGeographically separated data partitions, reference-based proxy tasks, sensitivity analysis, false-positive assessment and uncertainty estimation will support comparative evaluation.\n\n## Scientific Visualization\n\nGeoreferenced anomaly maps and interactive terrain visualization will communicate findings after scientific validation.\n\n## Current Limitations\n\nExisting terrestrial reference datasets and synthetic fixtures are used only for engineering validation. No geological discoveries or validated planetary anomaly detection results are currently claimed.",
+    "repository_url":  null,
+    "components":  [
+                       {
+                           "category":  "Language",
+                           "name":  "Python"
+                       },
+                       {
+                           "category":  "Framework",
+                           "name":  "Rasterio"
+                       }
+                   ]
+}
