@@ -89,7 +89,7 @@ export default async function PortfolioRoot() {
   ).sort((a, b) => a.localeCompare(b));
 
   return (
-    <main>
+    <main className="archive-page">
       <header className="mb-16 border-b-2 border-black pb-8">
         <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em]">
           Research Archive / 2026
@@ -110,7 +110,7 @@ export default async function PortfolioRoot() {
         </p>
       </header>
 
-      <section className="mb-20">
+      <section className="mb-14 lg:mb-16">
         <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
           <h2 className="text-xl uppercase tracking-wide">
             Software Projects
@@ -126,7 +126,7 @@ export default async function PortfolioRoot() {
             No software projects currently indexed.
           </p>
         ) : (
-          <div className="horizontal-matrix no-scrollbar">
+          <div className="horizontal-matrix project-matrix">
             {projects.map((project) => (
               <div className="snap-voxel" key={project.id}>
                 <VoxelCard project={project} />
@@ -136,7 +136,7 @@ export default async function PortfolioRoot() {
         )}
       </section>
 
-      <section className="mb-20">
+      <section className="mb-14 lg:mb-16">
         <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
           <h2 className="text-xl uppercase tracking-wide">
             Academic Publications
@@ -158,7 +158,7 @@ export default async function PortfolioRoot() {
             No academic publications currently indexed.
           </p>
         ) : (
-          <div className="horizontal-matrix no-scrollbar">
+          <div className="horizontal-matrix publication-matrix">
             {papers.map((paper) => (
               <ResearchPaperCard key={paper.id} paper={paper} />
             ))}
@@ -166,7 +166,7 @@ export default async function PortfolioRoot() {
         )}
       </section>
 
-      <section className="mb-20">
+      <section className="mb-14 lg:mb-16">
         <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
           <h2 className="text-xl uppercase tracking-wide">
             Technical Skills

@@ -18,9 +18,9 @@ html {
 }
 
 body {
-  max-width: 900px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 48px 32px;
+  padding: 48px clamp(20px, 3vw, 56px);
   background: var(--background);
   color: var(--foreground);
   font-family: Georgia, "Times New Roman", serif;
@@ -386,5 +386,159 @@ th, td {
     flex: 0 0 min(320px, calc(100vw - 5rem));
     scroll-snap-align: center;
     scroll-snap-stop: always;
+  }
+}
+
+
+/* Task 16B: Responsive landscape architecture */
+
+.archive-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.research-page {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+/* Maintain readable academic prose. */
+.research-page .research-content p,
+.research-page .research-content ul,
+.research-page .research-content ol,
+.research-page .research-content blockquote {
+  max-width: 78ch;
+}
+
+.research-page .research-content table {
+  max-width: 1100px;
+}
+
+@layer utilities {
+  .archive-page .horizontal-matrix {
+    gap: 2.5rem;
+    padding: 1.5rem 2.5rem 2.75rem 0.25rem;
+    align-items: stretch;
+    scroll-padding-inline-start: 0.25rem;
+    scrollbar-width: thin;
+  }
+
+  .project-matrix .snap-voxel {
+    flex: 0 0 min(360px, 100%);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .publication-matrix .snap-voxel {
+    flex: 0 0 min(720px, 100%);
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .project-matrix .voxel-link {
+    display: flex;
+    height: 100%;
+  }
+
+  .archive-page .voxel-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .archive-page .voxel-card-content {
+    flex: 1;
+    min-width: 0;
+    padding: clamp(1.25rem, 2vw, 2rem);
+  }
+
+  .archive-page .voxel-title {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: clamp(1.2rem, 1.6vw, 1.6rem);
+  }
+
+  .archive-page .voxel-index {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .archive-page .voxel-status {
+    flex-shrink: 0;
+  }
+
+  .publication-matrix .voxel-card,
+  .publication-matrix .voxel-card-content {
+    min-height: 0;
+  }
+
+  .publication-matrix .voxel-title {
+    margin-top: 1.25rem;
+  }
+
+  .publication-matrix .voxel-stack {
+    margin-top: 0;
+  }
+
+  /* Keyboard navigation. */
+  .voxel-link:focus-visible,
+  .voxel-open:focus-visible {
+    outline: 2px solid #111;
+    outline-offset: 5px;
+  }
+
+  /* Desktop landscape matrix. */
+  @media (min-width: 1200px) {
+    .archive-page .project-matrix {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+
+    .archive-page .publication-matrix {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(min(100%, 560px), 1fr));
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+  }
+
+  /* Small-screen layout. */
+  @media (max-width: 639px) {
+    .archive-page .horizontal-matrix {
+      gap: 2rem;
+      padding: 1rem 2rem 2.5rem 0.25rem;
+    }
+
+    .archive-page .voxel-card-heading {
+      gap: 0.5rem;
+    }
+
+    .archive-page .voxel-card-content {
+      padding: 1.25rem;
+    }
+
+    .research-page .research-content table {
+      display: block;
+      overflow-x: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .archive-page .horizontal-matrix {
+      scroll-behavior: auto;
+    }
+
+    .archive-page .voxel-card {
+      transition: none;
+    }
+
+    .archive-page .voxel-link:hover .voxel-card {
+      transform: none;
+    }
   }
 }

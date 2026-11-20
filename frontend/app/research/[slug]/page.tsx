@@ -56,7 +56,7 @@ export default async function ResearchProjectPage({ params }: PageProps) {
   }
 
   return (
-    <main>
+    <main className="research-page">
       <header className="mb-10 border-b-2 border-black pb-6">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
           <h1 className="text-3xl font-bold sm:text-4xl">
