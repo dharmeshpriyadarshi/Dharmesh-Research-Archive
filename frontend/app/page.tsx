@@ -100,7 +100,7 @@ export default async function PortfolioRoot() {
         </h1>
 
         <p className="text-lg text-gray-600">
-          M.Sc. Data Science Candidate | Applied Machine Learning
+          Computer Science Graduate | Applied Machine Learning Research
         </p>
 
         <p className="mt-5 max-w-2xl text-sm text-gray-600">
