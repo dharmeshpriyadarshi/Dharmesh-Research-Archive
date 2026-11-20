@@ -1,3 +1,4 @@
+import ProjectCarousel from "./components/ProjectCarousel";
 
 import VoxelCard from "./components/VoxelCard";
 import ResearchPaperCard from "./components/ResearchPaperCard";
@@ -126,13 +127,13 @@ export default async function PortfolioRoot() {
             No software projects currently indexed.
           </p>
         ) : (
-          <div className="horizontal-matrix project-matrix">
+          <ProjectCarousel>
             {projects.map((project) => (
               <div className="snap-voxel" key={project.id}>
                 <VoxelCard project={project} />
               </div>
             ))}
-          </div>
+          </ProjectCarousel>
         )}
       </section>
 
