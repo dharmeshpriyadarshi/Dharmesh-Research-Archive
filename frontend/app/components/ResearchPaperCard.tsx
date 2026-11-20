@@ -14,6 +14,12 @@ export default function ResearchPaperCard({
 }: {
   paper: ResearchPaper;
 }) {
+  const doiUrl = paper.doi
+    ? `https://doi.org/${paper.doi}`
+    : null;
+
+  const accessUrl = paper.pdf_url || doiUrl;
+
   const publicationDate = paper.publication_date
     ? new Date(paper.publication_date).toLocaleDateString(
         "en",
@@ -39,7 +45,7 @@ export default function ResearchPaperCard({
 
         <h3 className="voxel-title">{paper.title}</h3>
 
-        <p className="mt-5 text-sm leading-relaxed text-gray-600">
+        <p className="mt-5 line-clamp-4 text-sm leading-relaxed text-gray-600">
           {paper.abstract}
         </p>
 
@@ -53,20 +59,30 @@ export default function ResearchPaperCard({
               <p>{paper.journal_or_conference}</p>
             )}
 
-            {paper.doi && (
-              <p className="break-all">DOI: {paper.doi}</p>
+            {doiUrl && (
+              <p className="break-all">
+                DOI:{" "}
+                <a
+                  href={doiUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-4 hover:opacity-75 transition-opacity"
+                >
+                  {paper.doi}
+                </a>
+              </p>
             )}
           </div>
         </div>
 
-        {paper.pdf_url ? (
+        {accessUrl ? (
           <a
-            href={paper.pdf_url}
+            href={accessUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="voxel-open"
           >
-            ACCESS PAPER 
+            {paper.pdf_url ? "ACCESS PAPER" : "VIEW PUBLICATION"}
           </a>
         ) : (
           <span className="voxel-open">

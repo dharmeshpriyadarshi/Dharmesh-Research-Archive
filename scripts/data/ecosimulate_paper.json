@@ -1,0 +1,8 @@
+﻿{
+    "pdf_url":  null,
+    "doi":  "10.1109/ICSCSA66339.2025.11170787",
+    "journal_or_conference":  "2025 5th International Conference on Soft Computing for Security Applications (ICSCSA)",
+    "abstract":  "Urban air pollution remains a critical challenge, particularly in regions affected by rapid urbanization and seasonal agricultural practices. This research introduces a real-time pollution monitoring and simulation platform that integrates live air quality data with a novel mitigation model based on artificial tree deployment. Using the Google Air Quality API, the system collects dynamic pollutant data including PM₂.₅, carbon monoxide (CO), and temperature from major Indian cities. A custom-defined Pollution Index (PI) equation is used to simulate pollution mitigation outcomes across subdivided urban grids. The platform allows users to visualize the effects of varying artificial tree densities on localized air quality through an interactive, web-based interface developed using HTML5, CSS3, JavaScript, and Python Flask. Simulation results highlight the potential for measurable reductions in pollution levels under different intervention scenarios. Future enhancements include cloud-based deployment, integration of additional pollutants, and the incorporation of AI-driven predictive modeling. Aligned with Sustainable Development Goals (SDGs), the project supports data-driven urban planning and offers a scalable, research-friendly tool for environmental management and policy decision-making",
+    "publication_date":  "2025-09-25T00:00:00Z",
+    "title":  "ECOSIMULATE: Pollution Mitigation and Simulation using AI-Driven Environmental Modeling"
+}
