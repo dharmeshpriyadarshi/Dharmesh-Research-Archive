@@ -768,3 +768,49 @@ body:has(.archive-publication-page) {
     overflow-x: auto;
   }
 }
+
+
+/* Task 16: consistent research project layout */
+
+/* Apply the publication page's centered canvas to projects. */
+body:has(.research-page:not(.archive-publication-page)) {
+  width: 100%;
+  max-width: none;
+  margin-inline: auto;
+  padding-inline: clamp(18px, 4vw, 72px);
+}
+
+/* Keep the document centered with balanced margins. */
+.research-page:not(.archive-publication-page) {
+  display: block;
+  width: 100%;
+  max-width: 1120px;
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+/* Allow project content to use the available width. */
+.research-page:not(.archive-publication-page) .research-content {
+  width: 100%;
+  max-width: none;
+}
+
+.research-page:not(.archive-publication-page)
+.research-content :is(p, ul, ol, blockquote) {
+  max-width: none;
+}
+
+/* Keep equations and tables within their containers. */
+.research-page:not(.archive-publication-page)
+.research-content :is(table, .katex-display) {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .research-page:not(.archive-publication-page)
+  .research-content table {
+    display: block;
+    overflow-x: auto;
+  }
+}
