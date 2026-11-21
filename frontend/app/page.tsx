@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ProjectCarousel from "./components/ProjectCarousel";
 
 import VoxelCard from "./components/VoxelCard";
@@ -95,11 +96,24 @@ export default async function PortfolioRoot() {
           Computer Science Graduate | Applied Machine Learning Research
         </p>
 
-        <p className="mt-5 max-w-2xl text-sm text-gray-600">
-          A technical archive documenting research,
-          computational experiments, machine learning
-          systems, and software architectures.
-        </p>
+        <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+          <p className="max-w-2xl text-sm text-gray-600">
+            A technical archive documenting research,
+            computational experiments, machine learning
+            systems, and software architectures.
+          </p>
+
+          <nav aria-label="Alternate portfolio experience" className="shrink-0 self-end sm:self-auto">
+            <Link
+              href="/steve"
+              aria-label="Switch to the Steve interactive experience"
+              className="archive-mode-switch inline-flex min-h-11 items-center gap-3 border border-neutral-500 px-4 py-2 font-mono text-xs text-neutral-700 transition-colors duration-200 hover:border-black hover:bg-black hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              The Steve Way
+              <span aria-hidden="true">?</span>
+            </Link>
+          </nav>
+        </div>
       </header>
 
       <section className="mb-14 lg:mb-16">

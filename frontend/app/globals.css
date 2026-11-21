@@ -814,3 +814,48 @@ body:has(.research-page:not(.archive-publication-page)) {
     overflow-x: auto;
   }
 }
+
+
+/* Task 17.1: shared archive layout with dark Steve colors */
+
+html:has(.steve-page),
+body:has(.steve-page) {
+  background: #0a0a0a;
+}
+
+.steve-page {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+
+/* Task 17.1: discreet route switch */
+
+@keyframes archive-mode-switch-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.archive-mode-switch {
+  animation: archive-mode-switch-enter 240ms ease-out both;
+}
+
+/* Maintain readable headings in the dark experience. */
+.steve-page h1,
+.steve-page h2 {
+  color: #f5f5f5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archive-mode-switch {
+    animation: none;
+  }
+}
