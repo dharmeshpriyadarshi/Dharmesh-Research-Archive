@@ -1,7 +1,7 @@
 # db/models.py
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Enum, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import DeclarativeBase, relationship
 
@@ -30,6 +30,12 @@ class Project(Base):
 
 class ResearchPaper(Base):
     __tablename__ = "research_papers"
+    __table_args__ = (
+        CheckConstraint(
+            "publication_status IN ('Published', 'Publication in progress', 'Unspecified')",
+            name="ck_research_papers_publication_status",
+        ),
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     title = Column(String(255), nullable=False)
@@ -39,6 +45,9 @@ class ResearchPaper(Base):
     publication_date = Column(DateTime(timezone=True), nullable=True)
     pdf_url = Column(Text, nullable=True)
     doi = Column(String(100), nullable=True)
+    authors = Column(JSONB, nullable=False, default=list, server_default="[]")
+    content = Column(Text, nullable=True)
+    publication_status = Column(String(32), nullable=False, server_default="Unspecified")
 
 class TechComponent(Base):
     __tablename__ = "tech_components"

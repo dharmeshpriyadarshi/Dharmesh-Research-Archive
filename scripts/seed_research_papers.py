@@ -1,5 +1,7 @@
-﻿
+
 import argparse
+import re
+from typing import Literal
 from datetime import datetime
 from getpass import getpass
 from pathlib import Path
@@ -37,6 +39,9 @@ class PublicationRecord(BaseModel):
     publication_date: datetime | None = None
     pdf_url: HttpUrl | None = None
     doi: str | None = Field(default=None, max_length=100)
+    authors: list[str] = Field(default_factory=list)
+    content: str | None = Field(default=None, min_length=1)
+    publication_status: Literal["Published", "Publication in progress", "Unspecified"] = "Unspecified"
 
     @field_validator("publication_date")
     @classmethod
@@ -48,20 +53,22 @@ class PublicationRecord(BaseModel):
         return value
 
 
-def seed_ecosimulate_paper(
-    db: Session,
-    record: PublicationRecord,
-) -> UUID:
-    """Insert or update the publication without changing its identity."""
+def seed_publication(db: Session, slug: str, record: PublicationRecord) -> UUID:
+    """Upsert one publication, preserving its identity and omitted new fields."""
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug) or len(slug) > 255:
+        raise ValueError("Invalid publication slug.")
 
     values = record.model_dump(mode="json")
+    for field in ("authors", "content", "publication_status"):
+        if field not in record.model_fields_set:
+            values.pop(field)
 
     # Preserve the datetime object for PostgreSQL.
     values["publication_date"] = record.publication_date
 
     statement = insert(ResearchPaper).values(
         id=uuid4(),
-        slug=ECOSIMULATE_SLUG,
+        slug=slug,
         **values,
     )
 
@@ -74,6 +81,11 @@ def seed_ecosimulate_paper(
     ).returning(ResearchPaper.id)
 
     return db.execute(statement).scalar_one()
+
+
+def seed_ecosimulate_paper(db: Session, record: PublicationRecord) -> UUID:
+    """Backward-compatible ECOSIMULATE entry point."""
+    return seed_publication(db, ECOSIMULATE_SLUG, record)
 
 
 def resolve_database_url(target: str):
@@ -116,7 +128,7 @@ def resolve_database_url(target: str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Seed the ECOSIMULATE research publication."
+        description="Seed one academic publication."
     )
 
     parser.add_argument(
@@ -130,6 +142,8 @@ def main():
         type=Path,
         required=True,
     )
+
+    parser.add_argument("--slug", default=ECOSIMULATE_SLUG)
 
     args = parser.parse_args()
 
@@ -147,11 +161,11 @@ def main():
     try:
         with Session(engine) as db:
             with db.begin():
-                paper_id = seed_ecosimulate_paper(db, record)
+                paper_id = seed_publication(db, args.slug, record)
 
         print("Publication seeded successfully.")
         print(f"Publication ID: {paper_id}")
-        print(f"Slug: {ECOSIMULATE_SLUG}")
+        print(f"Slug: {args.slug}")
         print(f"Target: {args.target}")
 
     finally:

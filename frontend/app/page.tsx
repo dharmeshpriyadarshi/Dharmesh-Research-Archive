@@ -2,6 +2,7 @@ import ProjectCarousel from "./components/ProjectCarousel";
 
 import VoxelCard from "./components/VoxelCard";
 import ResearchPaperCard from "./components/ResearchPaperCard";
+import type { ResearchPaper } from "./types/publication";
 
 interface TechComponent {
   id: number;
@@ -27,16 +28,6 @@ interface Project {
   metrics: ProjectMetric[];
 }
 
-interface ResearchPaper {
-  id: string;
-  title: string;
-  slug: string;
-  abstract: string;
-  journal_or_conference?: string | null;
-  publication_date?: string | null;
-  pdf_url?: string | null;
-  doi?: string | null;
-}
 
 async function getProjects(): Promise<Project[]> {
   const apiUrl =
