@@ -40,12 +40,20 @@ const WALKABLE_MATERIALS = new Set([
   "Farmland",
 ]);
 
+type CameraOrbit = {
+  yaw: number;
+  pitch: number;
+  distance: number;
+};
+
 function PlayableWorld({
   onNearChest,
   paused,
+  orbit,
 }: {
   onNearChest: (near: boolean) => void;
   paused: boolean;
+  orbit: { current: CameraOrbit };
 }) {
   const world = useGLTF(WORLD_URL);
   const steve = useGLTF(STEVE_URL);
@@ -65,6 +73,10 @@ function PlayableWorld({
   const origin = useMemo(() => new THREE.Vector3(), []);
   const cameraGoal = useMemo(() => new THREE.Vector3(), []);
   const target = useMemo(() => new THREE.Vector3(), []);
+  const cameraDirection = useMemo(
+    () => new THREE.Vector3(),
+    []
+  );
 
   const steveOffset = useMemo(
     () =>
@@ -180,8 +192,18 @@ function PlayableWorld({
       keys.current.has("KeyS") ||
       keys.current.has("ArrowDown");
 
-    let dx = Number(right) - Number(left);
-    let dz = Number(backward) - Number(forward);
+    // Movement is relative to the camera, not world axes.
+    const sideways = Number(right) - Number(left);
+    const forwardInput = Number(forward) - Number(backward);
+    const yaw = orbit.current.yaw;
+
+    let dx =
+      sideways * Math.cos(yaw) -
+      forwardInput * Math.sin(yaw);
+
+    let dz =
+      -sideways * Math.sin(yaw) -
+      forwardInput * Math.cos(yaw);
 
     if (!paused) {
       if (jumpRequested.current && grounded.current) {
@@ -319,14 +341,84 @@ function PlayableWorld({
       playerRef.current.position.copy(p);
     }
 
-    cameraGoal.set(p.x + 3.5, p.y + 4.2, p.z + 6);
+    // Smooth third-person camera with adjustable orbit.
+    target.set(p.x, p.y + 1.0, p.z);
 
-    camera.position.lerp(
-      cameraGoal,
-      1 - Math.exp(-5 * delta)
+    const settings = orbit.current;
+    const horizontal =
+      Math.cos(settings.pitch) * settings.distance;
+
+    cameraGoal.set(
+      target.x + Math.sin(settings.yaw) * horizontal,
+      target.y + Math.sin(settings.pitch) * settings.distance,
+      target.z + Math.cos(settings.yaw) * horizontal
     );
 
-    target.set(p.x, p.y + 1.1, p.z);
+    // Prevent the camera from remaining behind solid
+    // environment geometry when its view is obstructed.
+    let obstructed = false;
+
+    if (terrainRef.current) {
+      cameraDirection.copy(cameraGoal).sub(target);
+
+      const viewDistance = cameraDirection.length();
+
+      if (viewDistance > 0.001) {
+        cameraDirection.divideScalar(viewDistance);
+        raycaster.set(target, cameraDirection);
+        raycaster.far = viewDistance;
+
+        const obstruction = raycaster
+          .intersectObject(terrainRef.current, true)
+          .find((hit) => {
+            if (hit.distance < 0.12) return false;
+
+            const material = (hit.object as THREE.Mesh).material;
+
+            const names = Array.isArray(material)
+              ? material.map((part) => part.name)
+              : [material?.name ?? ""];
+
+            const decorative = new Set([
+              "Short_Grass",
+              "Dandelion",
+              "Poppy",
+              "Oak_Leaves",
+              "Oak_Sapling",
+              "Wheat",
+              "Carrot",
+              "Potato",
+              "Sugar_Cane",
+            ]);
+
+            return !names.every((name) => decorative.has(name));
+          });
+
+        if (obstruction) {
+          obstructed = true;
+
+          const safeDistance = Math.max(
+            0.8,
+            obstruction.distance - 0.2
+          );
+
+          cameraGoal
+            .copy(target)
+            .addScaledVector(cameraDirection, safeDistance);
+        }
+      }
+    }
+
+    if (obstructed) {
+      // Snap inward to avoid briefly passing through walls.
+      camera.position.copy(cameraGoal);
+    } else {
+      camera.position.lerp(
+        cameraGoal,
+        1 - Math.exp(-7 * delta)
+      );
+    }
+
     camera.lookAt(target);
 
     const near =
@@ -364,6 +456,7 @@ function PlayableWorld({
           object={steve.scene}
           scale={STEVE_SCALE}
           position={[0, steveOffset, 0]}
+          rotation={[0, Math.PI, 0]}
         />
       </group>
 
@@ -377,6 +470,18 @@ function PlayableWorld({
 }
 
 export default function HouseScene() {
+  const orbit = useRef<CameraOrbit>({
+    yaw: Math.atan2(3.5, 6),
+    pitch: 0.48,
+    distance: 7.3,
+  });
+
+  const dragging = useRef<{
+    pointerId: number;
+    x: number;
+    y: number;
+  } | null>(null);
+
   const [nearChest, setNearChest] = useState(false);
   const [chestOpen, setChestOpen] = useState(false);
 
@@ -402,7 +507,53 @@ export default function HouseScene() {
   }, [nearChest]);
 
   return (
-    <div className="relative h-full w-full">
+    <div
+      className="relative h-full w-full"
+      style={{ touchAction: "none" }}
+      onPointerDown={(event) => {
+        if (!(event.target instanceof HTMLCanvasElement)) return;
+        if (event.pointerType === "mouse" && event.button !== 0) {
+          return;
+        }
+
+        dragging.current = {
+          pointerId: event.pointerId,
+          x: event.clientX,
+          y: event.clientY,
+        };
+
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }}
+      onPointerMove={(event) => {
+        const drag = dragging.current;
+        if (!drag || drag.pointerId !== event.pointerId) return;
+
+        const deltaX = event.clientX - drag.x;
+        const deltaY = event.clientY - drag.y;
+
+        orbit.current.yaw -= deltaX * 0.006;
+        orbit.current.pitch = THREE.MathUtils.clamp(
+          orbit.current.pitch + deltaY * 0.004,
+          0.18,
+          1.18
+        );
+
+        drag.x = event.clientX;
+        drag.y = event.clientY;
+      }}
+      onPointerUp={(event) => {
+        if (dragging.current?.pointerId === event.pointerId) {
+          dragging.current = null;
+        }
+
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+      }}
+      onPointerCancel={() => {
+        dragging.current = null;
+      }}
+    >
       <Canvas
         camera={{
           position: [8, 5, 14],
@@ -418,9 +569,42 @@ export default function HouseScene() {
           <PlayableWorld
             onNearChest={setNearChest}
             paused={chestOpen}
+            orbit={orbit}
           />
         </Suspense>
       </Canvas>
+
+      {!chestOpen && (
+        <div className="absolute left-3 top-3 z-10 flex gap-2">
+          <button
+            type="button"
+            aria-label="Move camera closer"
+            onClick={() => {
+              orbit.current.distance = Math.max(
+                2.5,
+                orbit.current.distance - 0.8
+              );
+            }}
+            className="min-h-11 border border-neutral-500 bg-black/80 px-3 font-mono text-xs text-white hover:bg-neutral-800"
+          >
+            Camera +
+          </button>
+
+          <button
+            type="button"
+            aria-label="Move camera farther away"
+            onClick={() => {
+              orbit.current.distance = Math.min(
+                9,
+                orbit.current.distance + 0.8
+              );
+            }}
+            className="min-h-11 border border-neutral-500 bg-black/80 px-3 font-mono text-xs text-white hover:bg-neutral-800"
+          >
+            Camera -
+          </button>
+        </div>
+      )}
 
       {nearChest && !chestOpen && (
         <button
