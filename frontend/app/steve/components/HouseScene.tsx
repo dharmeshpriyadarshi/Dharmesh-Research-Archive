@@ -15,8 +15,30 @@ const WORLD_SCALE = 10;
 const STEVE_SCALE = 0.05;
 const CHEST_SCALE = 0.006;
 
-const SPAWN = { x: 4, z: 8 };
-const CHEST = { x: 6, z: 7 };
+const SPAWN = { x: 4, y: 3.125, z: 8 };
+const CHEST = { x: 6, y: 3.125, z: 7 };
+
+const WALKABLE_MATERIALS = new Set([
+  "Grass_Block",
+  "Stone",
+  "Cobblestone",
+  "Gravel",
+  "Dirt",
+  "Sand",
+  "Sandstone",
+  "Oak_Planks",
+  "Oak_Slab",
+  "Double_Oak_Slab",
+  "Stone_Slab",
+  "Double_Stone_Slab",
+  "Oak_Stairs",
+  "Birch_Stairs",
+  "Cobblestone_Stairs",
+  "Stone_Brick_Stairs",
+  "Spruce_Stairs",
+  "Jungle_Stairs",
+  "Farmland",
+]);
 
 function PlayableWorld({
   onNearChest,
@@ -32,7 +54,7 @@ function PlayableWorld({
   const terrainRef = useRef<THREE.Group>(null);
   const playerRef = useRef<THREE.Group>(null);
   const keys = useRef(new Set<string>());
-  const player = useRef(new THREE.Vector3(SPAWN.x, 0, SPAWN.z));
+  const player = useRef(new THREE.Vector3(SPAWN.x, SPAWN.y, SPAWN.z));
   const nearRef = useRef(false);
 
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
@@ -114,7 +136,7 @@ function PlayableWorld({
       );
 
       if (terrainRef.current) {
-        origin.set(nextX, 3.5, nextZ);
+        origin.set(nextX, p.y + 1.0, nextZ);
         raycaster.set(origin, down);
 
         const hits = raycaster.intersectObject(
@@ -123,12 +145,24 @@ function PlayableWorld({
 
         // Prototype walkable-surface detection:
         // avoid jumping onto roofs and steep objects.
-        const ground = hits.find(
-          (hit) =>
-            hit.point.y >= -0.1 &&
-            hit.point.y <= 3 &&
+        const ground = hits.find((hit) => {
+          const mesh = hit.object as THREE.Mesh;
+          const material = mesh.material;
+
+          const walkable = Array.isArray(material)
+            ? material.some((part) =>
+                WALKABLE_MATERIALS.has(part.name)
+              )
+            : Boolean(
+                material && WALKABLE_MATERIALS.has(material.name)
+              );
+
+          return (
+            walkable &&
+            (hit.face?.normal.y ?? -1) >= 0.65 &&
             Math.abs(hit.point.y - p.y) <= 0.75
-        );
+          );
+        });
 
         if (ground) {
           // Check for nearby solid geometry at waist height.
@@ -195,7 +229,7 @@ function PlayableWorld({
 
       <group
         ref={playerRef}
-        position={[SPAWN.x, 0, SPAWN.z]}
+        position={[SPAWN.x, SPAWN.y, SPAWN.z]}
       >
         <primitive
           object={steve.scene}
@@ -207,7 +241,7 @@ function PlayableWorld({
       <primitive
         object={chest.scene}
         scale={CHEST_SCALE}
-        position={[CHEST.x, chestOffset, CHEST.z]}
+        position={[CHEST.x, CHEST.y + chestOffset, CHEST.z]}
       />
     </>
   );
