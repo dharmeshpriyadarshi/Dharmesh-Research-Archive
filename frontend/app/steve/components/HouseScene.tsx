@@ -12,8 +12,8 @@ const STEVE_URL = "/models/minecraft_-_steve.glb";
 const CHEST_URL = "/models/minecraft_chest.glb";
 
 const WORLD_SCALE = 10;
-const STEVE_SCALE = 0.05;
-const CHEST_SCALE = 0.006;
+const STEVE_SCALE = 0.0390625;
+const CHEST_SCALE = 0.00324;
 
 const SPAWN = { x: 4, y: 3.125, z: 8 };
 const CHEST = { x: 6, y: 3.125, z: 7 };
@@ -56,6 +56,9 @@ function PlayableWorld({
   const keys = useRef(new Set<string>());
   const player = useRef(new THREE.Vector3(SPAWN.x, SPAWN.y, SPAWN.z));
   const nearRef = useRef(false);
+  const grounded = useRef(true);
+  const verticalVelocity = useRef(0);
+  const jumpRequested = useRef(false);
 
   const raycaster = useMemo(() => new THREE.Raycaster(), []);
   const down = useMemo(() => new THREE.Vector3(0, -1, 0), []);
@@ -84,6 +87,12 @@ function PlayableWorld({
     ]);
 
     const keyDown = (event: KeyboardEvent) => {
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (!event.repeat) jumpRequested.current = true;
+        return;
+      }
+
       if (!movementKeys.has(event.code)) return;
       event.preventDefault();
       keys.current.add(event.code);
@@ -93,7 +102,10 @@ function PlayableWorld({
       keys.current.delete(event.code);
     };
 
-    const reset = () => keys.current.clear();
+    const reset = () => {
+      keys.current.clear();
+      jumpRequested.current = false;
+    };
 
     window.addEventListener("keydown", keyDown);
     window.addEventListener("keyup", keyUp);
@@ -110,84 +122,197 @@ function PlayableWorld({
     const delta = Math.min(elapsed, 0.05);
     const p = player.current;
 
-    const left = keys.current.has("KeyA") ||
+    // The GLB contains Z-up geometry rotated into Y-up space.
+    // Raycast face normals must therefore be transformed to world space.
+    const findGround = (
+      x: number,
+      z: number,
+      feetY: number
+    ): number | null => {
+      if (!terrainRef.current) return null;
+
+      origin.set(x, feetY + 1.5, z);
+      raycaster.set(origin, down);
+      raycaster.far = 6;
+
+      const hits = raycaster.intersectObject(
+        terrainRef.current,
+        true
+      );
+
+      const ground = hits.find((hit) => {
+        const mesh = hit.object as THREE.Mesh;
+        const material = mesh.material;
+
+        const walkable = Array.isArray(material)
+          ? material.some((part) =>
+              WALKABLE_MATERIALS.has(part.name)
+            )
+          : Boolean(
+              material && WALKABLE_MATERIALS.has(material.name)
+            );
+
+        if (!walkable || !hit.face) return false;
+
+        const normal = hit.face.normal
+          .clone()
+          .transformDirection(hit.object.matrixWorld);
+
+        return (
+          normal.y >= 0.65 &&
+          hit.point.y <= feetY + 0.43
+        );
+      });
+
+      return ground?.point.y ?? null;
+    };
+
+    const left =
+      keys.current.has("KeyA") ||
       keys.current.has("ArrowLeft");
-    const right = keys.current.has("KeyD") ||
+    const right =
+      keys.current.has("KeyD") ||
       keys.current.has("ArrowRight");
-    const forward = keys.current.has("KeyW") ||
+    const forward =
+      keys.current.has("KeyW") ||
       keys.current.has("ArrowUp");
-    const backward = keys.current.has("KeyS") ||
+    const backward =
+      keys.current.has("KeyS") ||
       keys.current.has("ArrowDown");
 
     let dx = Number(right) - Number(left);
     let dz = Number(backward) - Number(forward);
 
-    if (!paused && (dx !== 0 || dz !== 0)) {
-      const length = Math.hypot(dx, dz);
-      dx /= length;
-      dz /= length;
+    if (!paused) {
+      if (jumpRequested.current && grounded.current) {
+        verticalVelocity.current = 4.0;
+        grounded.current = false;
+      }
 
-      const speed = 2.8;
-      const nextX = THREE.MathUtils.clamp(
-        p.x + dx * speed * delta, -8.8, 8.8
-      );
-      const nextZ = THREE.MathUtils.clamp(
-        p.z + dz * speed * delta, -9.8, 9.8
-      );
+      jumpRequested.current = false;
 
-      if (terrainRef.current) {
-        origin.set(nextX, p.y + 1.0, nextZ);
-        raycaster.set(origin, down);
+      if (dx !== 0 || dz !== 0) {
+        const length = Math.hypot(dx, dz);
+        dx /= length;
+        dz /= length;
 
-        const hits = raycaster.intersectObject(
-          terrainRef.current, true
+        const speed = 2.8;
+        const nextX = THREE.MathUtils.clamp(
+          p.x + dx * speed * delta, -8.8, 8.8
+        );
+        const nextZ = THREE.MathUtils.clamp(
+          p.z + dz * speed * delta, -9.8, 9.8
         );
 
-        // Prototype walkable-surface detection:
-        // avoid jumping onto roofs and steep objects.
-        const ground = hits.find((hit) => {
-          const mesh = hit.object as THREE.Mesh;
-          const material = mesh.material;
+        let blocked = false;
 
-          const walkable = Array.isArray(material)
-            ? material.some((part) =>
-                WALKABLE_MATERIALS.has(part.name)
-              )
-            : Boolean(
-                material && WALKABLE_MATERIALS.has(material.name)
-              );
+        if (terrainRef.current) {
+          origin.set(p.x, p.y + 0.6, p.z);
 
-          return (
-            walkable &&
-            (hit.face?.normal.y ?? -1) >= 0.65 &&
-            Math.abs(hit.point.y - p.y) <= 0.75
-          );
-        });
-
-        if (ground) {
-          // Check for nearby solid geometry at waist height.
-          origin.set(p.x, p.y + 0.8, p.z);
           raycaster.set(
             origin,
             new THREE.Vector3(dx, 0, dz)
           );
+          raycaster.far = 0.36;
 
-          const blocked = raycaster.intersectObject(
-            terrainRef.current, true
-          ).some(
-            (hit) => hit.distance > 0.02 &&
-              hit.distance < 0.42
+          blocked = raycaster
+            .intersectObject(terrainRef.current, true)
+            .some((hit) => {
+              const material = (
+                hit.object as THREE.Mesh
+              ).material;
+
+              const names = Array.isArray(material)
+                ? material.map((part) => part.name)
+                : [material?.name ?? ""];
+
+              // Decorative vegetation does not block Steve.
+              if (
+                names.every((name) =>
+                  [
+                    "Short_Grass",
+                    "Dandelion",
+                    "Poppy",
+                    "Wheat",
+                    "Carrot",
+                    "Potato",
+                  ].includes(name)
+                )
+              ) {
+                return false;
+              }
+
+              if (!hit.face || hit.distance <= 0.02) {
+                return false;
+              }
+
+              const normal = hit.face.normal
+                .clone()
+                .transformDirection(hit.object.matrixWorld);
+
+              return Math.abs(normal.y) < 0.45;
+            });
+        }
+
+        if (!blocked) {
+          const nextGround = findGround(
+            nextX,
+            nextZ,
+            p.y
           );
 
-          if (!blocked) {
-            p.set(nextX, ground.point.y, nextZ);
+          const validStep =
+            nextGround !== null &&
+            nextGround <= p.y + 0.43 &&
+            nextGround >= p.y - 0.8;
+
+          if (!grounded.current || validStep) {
+            p.x = nextX;
+            p.z = nextZ;
+
+            if (grounded.current && nextGround !== null) {
+              p.y = nextGround;
+            }
+          }
+        }
+
+        if (playerRef.current) {
+          playerRef.current.rotation.y = Math.atan2(
+            -dx,
+            -dz
+          );
+        }
+      }
+
+      if (!grounded.current) {
+        const previousY = p.y;
+
+        verticalVelocity.current -= 12 * delta;
+        p.y += verticalVelocity.current * delta;
+
+        if (verticalVelocity.current <= 0) {
+          const floor = findGround(p.x, p.z, p.y);
+
+          if (
+            floor !== null &&
+            p.y <= floor &&
+            previousY >= floor - 0.15
+          ) {
+            p.y = floor;
+            verticalVelocity.current = 0;
+            grounded.current = true;
           }
         }
       }
 
-      if (playerRef.current) {
-        playerRef.current.rotation.y = Math.atan2(-dx, -dz);
+      // Recover from falling outside the navigable world.
+      if (p.y < -3) {
+        p.set(SPAWN.x, SPAWN.y, SPAWN.z);
+        verticalVelocity.current = 0;
+        grounded.current = true;
       }
+    } else {
+      jumpRequested.current = false;
     }
 
     if (playerRef.current) {
@@ -195,6 +320,7 @@ function PlayableWorld({
     }
 
     cameraGoal.set(p.x + 3.5, p.y + 4.2, p.z + 6);
+
     camera.position.lerp(
       cameraGoal,
       1 - Math.exp(-5 * delta)
@@ -204,7 +330,10 @@ function PlayableWorld({
     camera.lookAt(target);
 
     const near =
-      Math.hypot(p.x - CHEST.x, p.z - CHEST.z) < 1.7;
+      Math.hypot(
+        p.x - CHEST.x,
+        p.z - CHEST.z
+      ) < 1.7;
 
     if (near !== nearRef.current) {
       nearRef.current = near;
