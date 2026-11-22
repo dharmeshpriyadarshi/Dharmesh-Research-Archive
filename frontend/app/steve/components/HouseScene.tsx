@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
 
 const WORLD_URL =
   "/models/bought-a-bigger-house-just-so-that-i-could-keep-you-somewhere-safe.glb";
@@ -44,6 +45,7 @@ type CameraOrbit = {
   yaw: number;
   pitch: number;
   distance: number;
+  following: boolean;
 };
 
 function PlayableWorld({
@@ -59,11 +61,29 @@ function PlayableWorld({
   const steve = useGLTF(STEVE_URL);
   const chest = useGLTF(CHEST_URL);
 
+  // Clone cached GLB scenes for every world entry.
+  // Preserve their original root rotations and transforms.
+  const worldScene = useMemo(
+    () => world.scene.clone(true),
+    [world.scene]
+  );
+
+  const steveScene = useMemo(
+    () => cloneSkeleton(steve.scene),
+    [steve.scene]
+  );
+
+  const chestScene = useMemo(
+    () => cloneSkeleton(chest.scene),
+    [chest.scene]
+  );
+
   const terrainRef = useRef<THREE.Group>(null);
   const playerRef = useRef<THREE.Group>(null);
   const keys = useRef(new Set<string>());
   const player = useRef(new THREE.Vector3(SPAWN.x, SPAWN.y, SPAWN.z));
   const nearRef = useRef(false);
+  const movementBasis = useRef<number | null>(null);
   const grounded = useRef(true);
   const verticalVelocity = useRef(0);
   const jumpRequested = useRef(false);
@@ -80,16 +100,16 @@ function PlayableWorld({
 
   const steveOffset = useMemo(
     () =>
-      -new THREE.Box3().setFromObject(steve.scene).min.y *
+      -new THREE.Box3().setFromObject(steveScene).min.y *
       STEVE_SCALE,
-    [steve.scene]
+    [steveScene]
   );
 
   const chestOffset = useMemo(
     () =>
-      -new THREE.Box3().setFromObject(chest.scene).min.y *
+      -new THREE.Box3().setFromObject(chestScene).min.y *
       CHEST_SCALE,
-    [chest.scene]
+    [chestScene]
   );
 
   useEffect(() => {
@@ -195,7 +215,19 @@ function PlayableWorld({
     // Movement is relative to the camera, not world axes.
     const sideways = Number(right) - Number(left);
     const forwardInput = Number(forward) - Number(backward);
-    const yaw = orbit.current.yaw;
+    const hasInput =
+      sideways !== 0 || forwardInput !== 0;
+
+    if (!hasInput || paused || !orbit.current.following) {
+      movementBasis.current = null;
+    }
+
+    // Prevent camera-follow rotation from continuously
+    // changing movement direction during a held keypress.
+    const yaw =
+      orbit.current.following && hasInput
+        ? (movementBasis.current ??= orbit.current.yaw)
+        : orbit.current.yaw;
 
     let dx =
       sideways * Math.cos(yaw) -
@@ -345,6 +377,20 @@ function PlayableWorld({
     target.set(p.x, p.y + 1.0, p.z);
 
     const settings = orbit.current;
+
+    if (settings.following && playerRef.current) {
+      const heading = playerRef.current.rotation.y;
+
+      const difference = Math.atan2(
+        Math.sin(heading - settings.yaw),
+        Math.cos(heading - settings.yaw)
+      );
+
+      settings.yaw += difference * (
+        1 - Math.exp(-7 * delta)
+      );
+    }
+
     const horizontal =
       Math.cos(settings.pitch) * settings.distance;
 
@@ -443,7 +489,7 @@ function PlayableWorld({
 
       <group ref={terrainRef}>
         <primitive
-          object={world.scene}
+          object={worldScene}
           scale={WORLD_SCALE}
         />
       </group>
@@ -453,7 +499,7 @@ function PlayableWorld({
         position={[SPAWN.x, SPAWN.y, SPAWN.z]}
       >
         <primitive
-          object={steve.scene}
+          object={steveScene}
           scale={STEVE_SCALE}
           position={[0, steveOffset, 0]}
           rotation={[0, Math.PI, 0]}
@@ -461,7 +507,7 @@ function PlayableWorld({
       </group>
 
       <primitive
-        object={chest.scene}
+        object={chestScene}
         scale={CHEST_SCALE}
         position={[CHEST.x, CHEST.y + chestOffset, CHEST.z]}
       />
@@ -471,9 +517,10 @@ function PlayableWorld({
 
 export default function HouseScene() {
   const orbit = useRef<CameraOrbit>({
-    yaw: Math.atan2(3.5, 6),
+    yaw: 0,
     pitch: 0.48,
-    distance: 7.3,
+    distance: 3.3,
+    following: true,
   });
 
   const dragging = useRef<{
@@ -482,6 +529,7 @@ export default function HouseScene() {
     y: number;
   } | null>(null);
 
+  const [following, setFollowing] = useState(true);
   const [nearChest, setNearChest] = useState(false);
   const [chestOpen, setChestOpen] = useState(false);
 
@@ -531,6 +579,14 @@ export default function HouseScene() {
         const deltaX = event.clientX - drag.x;
         const deltaY = event.clientY - drag.y;
 
+        if (
+          orbit.current.following &&
+          (deltaX !== 0 || deltaY !== 0)
+        ) {
+          orbit.current.following = false;
+          setFollowing(false);
+        }
+
         orbit.current.yaw -= deltaX * 0.006;
         orbit.current.pitch = THREE.MathUtils.clamp(
           orbit.current.pitch + deltaY * 0.004,
@@ -575,7 +631,19 @@ export default function HouseScene() {
       </Canvas>
 
       {!chestOpen && (
-        <div className="absolute left-3 top-3 z-10 flex gap-2">
+        <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
+          {!following && (
+            <button
+              type="button"
+              onClick={() => {
+                orbit.current.following = true;
+                setFollowing(true);
+              }}
+              className="min-h-11 border border-neutral-500 bg-black/80 px-3 font-mono text-xs text-white hover:bg-neutral-800"
+            >
+              Follow Steve
+            </button>
+          )}
           <button
             type="button"
             aria-label="Move camera closer"
