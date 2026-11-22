@@ -52,10 +52,12 @@ function PlayableWorld({
   onNearChest,
   paused,
   orbit,
+  showChestMarker,
 }: {
   onNearChest: (near: boolean) => void;
   paused: boolean;
   orbit: { current: CameraOrbit };
+  showChestMarker: boolean;
 }) {
   const world = useGLTF(WORLD_URL);
   const steve = useGLTF(STEVE_URL);
@@ -511,6 +513,24 @@ function PlayableWorld({
         scale={CHEST_SCALE}
         position={[CHEST.x, CHEST.y + chestOffset, CHEST.z]}
       />
+
+      {showChestMarker && (
+        <group position={[CHEST.x, CHEST.y + 1.15, CHEST.z]}>
+          <mesh renderOrder={100}>
+            <octahedronGeometry args={[0.16, 0]} />
+            <meshBasicMaterial
+              color="#facc15"
+              depthTest={false}
+              depthWrite={false}
+            />
+          </mesh>
+          <pointLight
+            color="#facc15"
+            intensity={0.7}
+            distance={3}
+          />
+        </group>
+      )}
     </>
   );
 }
@@ -530,6 +550,7 @@ export default function HouseScene() {
   } | null>(null);
 
   const [following, setFollowing] = useState(true);
+  const [showChestMarker, setShowChestMarker] = useState(false);
   const [nearChest, setNearChest] = useState(false);
   const [chestOpen, setChestOpen] = useState(false);
 
@@ -626,12 +647,21 @@ export default function HouseScene() {
             onNearChest={setNearChest}
             paused={chestOpen}
             orbit={orbit}
+            showChestMarker={showChestMarker}
           />
         </Suspense>
       </Canvas>
 
       {!chestOpen && (
         <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setShowChestMarker((value) => !value)}
+            aria-pressed={showChestMarker}
+            className="min-h-11 border border-neutral-500 bg-black/80 px-3 font-mono text-xs text-white hover:bg-neutral-800"
+          >
+            {showChestMarker ? "Hide Chest Marker" : "Locate Chest"}
+          </button>
           {!following && (
             <button
               type="button"
