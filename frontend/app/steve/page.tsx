@@ -1,4 +1,5 @@
 import Link from "next/link";
+import HouseExperience from "./components/HouseExperience";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -49,29 +50,18 @@ export default function StevePage() {
 
         <section
           aria-labelledby="world-heading"
-          className="mt-10 flex min-h-[360px] flex-col items-center justify-center border border-neutral-700 bg-neutral-900 px-6 py-14 text-center"
+          className="mt-10"
         >
-          <div
-            aria-hidden="true"
-            className="mb-10 grid grid-cols-3 gap-2"
-          >
-            {Array.from({ length: 9 }, (_, index) => (
-              <span
-                key={index}
-                className="h-12 w-12 border border-neutral-500 bg-neutral-700 shadow-[5px_5px_0_#414a3e]"
-              />
-            ))}
+          <div className="mb-6 border-b border-neutral-700 pb-3">
+            <h2
+              id="world-heading"
+              className="text-xl font-bold text-neutral-100"
+            >
+              The Overworld
+            </h2>
           </div>
 
-          <h2 id="world-heading" className="text-xl font-bold">
-            World foundation established
-          </h2>
-
-          <p className="mt-3 max-w-lg text-sm text-neutral-400">
-            The interactive 3D room, project chests, crafting
-            interface and skill hotbar will be added in the next
-            development stages.
-          </p>
+          <HouseExperience />
         </section>
       </div>
     </main>
