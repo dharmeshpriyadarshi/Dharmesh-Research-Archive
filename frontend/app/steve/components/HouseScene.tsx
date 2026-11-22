@@ -53,11 +53,13 @@ function PlayableWorld({
   paused,
   orbit,
   showChestMarker,
+  doorsOpen,
 }: {
   onNearChest: (near: boolean) => void;
   paused: boolean;
   orbit: { current: CameraOrbit };
   showChestMarker: boolean;
+  doorsOpen: boolean;
 }) {
   const world = useGLTF(WORLD_URL);
   const steve = useGLTF(STEVE_URL);
@@ -99,6 +101,28 @@ function PlayableWorld({
     () => new THREE.Vector3(),
     []
   );
+
+  // Temporary entrance-access test.
+  // Doors and gates are combined by material in this GLB.
+  useEffect(() => {
+    worldScene.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+
+      const materials = Array.isArray(object.material)
+        ? object.material
+        : [object.material];
+
+      const isEntrance = materials.some(
+        (material) =>
+          material.name === "Oak_Door" ||
+          material.name === "Fence_Gate"
+      );
+
+      if (isEntrance) {
+        object.visible = !doorsOpen;
+      }
+    });
+  }, [worldScene, doorsOpen]);
 
   const steveOffset = useMemo(
     () =>
@@ -274,6 +298,9 @@ function PlayableWorld({
           blocked = raycaster
             .intersectObject(terrainRef.current, true)
             .some((hit) => {
+              // Hidden entrance meshes must not block movement.
+              if (!hit.object.visible) return false;
+
               const material = (
                 hit.object as THREE.Mesh
               ).material;
@@ -419,6 +446,8 @@ function PlayableWorld({
         const obstruction = raycaster
           .intersectObject(terrainRef.current, true)
           .find((hit) => {
+            // Ignore temporarily opened entrances.
+            if (!hit.object.visible) return false;
             if (hit.distance < 0.12) return false;
 
             const material = (hit.object as THREE.Mesh).material;
@@ -551,6 +580,7 @@ export default function HouseScene() {
 
   const [following, setFollowing] = useState(true);
   const [showChestMarker, setShowChestMarker] = useState(false);
+  const [doorsOpen, setDoorsOpen] = useState(false);
   const [nearChest, setNearChest] = useState(false);
   const [chestOpen, setChestOpen] = useState(false);
 
@@ -648,12 +678,23 @@ export default function HouseScene() {
             paused={chestOpen}
             orbit={orbit}
             showChestMarker={showChestMarker}
+            doorsOpen={doorsOpen}
           />
         </Suspense>
       </Canvas>
 
       {!chestOpen && (
         <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
+          <button
+            type="button"
+            aria-pressed={doorsOpen}
+            onClick={() => setDoorsOpen((value) => !value)}
+            className="min-h-11 border border-amber-500 bg-black/80 px-3 font-mono text-xs text-amber-200 hover:bg-neutral-800"
+          >
+            {doorsOpen
+              ? "Close Entrances (Test)"
+              : "Open Entrances (Test)"}
+          </button>
           <button
             type="button"
             onClick={() => setShowChestMarker((value) => !value)}
