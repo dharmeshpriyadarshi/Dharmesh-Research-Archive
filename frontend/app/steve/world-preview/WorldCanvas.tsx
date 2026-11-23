@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import { Suspense, useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
 import {
   Bounds,
   Center,
@@ -10,6 +11,28 @@ import {
 } from "@react-three/drei";
 
 const WORLD_URL = "/models/soulwitchs-world.glb";
+
+// Confirmed material names from the exported GLB.
+// Keep glass, doors, and other materials unchanged.
+const CUTOUT_MATERIAL_NAMES = new Set([
+  "acacia_leaves",
+  "bamboo_large_leaves",
+  "bamboo_small_leaves",
+  "bamboo_stalk",
+  "cherry_leaves",
+  "cherry_sapling",
+  "cornflower",
+  "crimson_fungus",
+  "dandelion",
+  "lilac_bottom",
+  "lilac_top",
+  "oak_leaves",
+  "pink_tulip",
+  "short_grass",
+  "tall_grass_bottom",
+  "tall_grass_top",
+  "vine",
+]);
 
 function WorldModel({
   onReady,
@@ -20,10 +43,42 @@ function WorldModel({
 
   // An independent instance prevents the cached GLB
   // from accumulating transforms between preview visits.
-  const instance = useMemo(
-    () => scene.clone(true),
-    [scene]
-  );
+  const instance = useMemo(() => {
+    // Clone the scene to avoid modifying the cached GLB.
+    const copy = scene.clone(true);
+
+    copy.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+
+      const fixMaterial = (
+        material: THREE.Material
+      ): THREE.Material => {
+        if (
+          !CUTOUT_MATERIAL_NAMES.has(material.name) ||
+          !(material instanceof THREE.MeshStandardMaterial)
+        ) {
+          return material;
+        }
+
+        // Preserve the original material and texture,
+        // but use alpha cutout instead of alpha blending.
+        const fixed = material.clone();
+
+        fixed.alphaTest = 0.5;
+        fixed.transparent = false;
+        fixed.depthWrite = true;
+        fixed.needsUpdate = true;
+
+        return fixed;
+      };
+
+      object.material = Array.isArray(object.material)
+        ? object.material.map(fixMaterial)
+        : fixMaterial(object.material);
+    });
+
+    return copy;
+  }, [scene]);
 
   useEffect(() => {
     onReady();
