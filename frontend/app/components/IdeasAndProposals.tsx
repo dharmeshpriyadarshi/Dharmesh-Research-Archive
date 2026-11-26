@@ -31,6 +31,31 @@ const PROPOSALS: Proposal[] = [
 ];
 
 export default function IdeasAndProposals() {
+  const emailCandidate = process.env.PUBLIC_CONTACT_EMAIL?.trim() ?? "";
+
+  const publicEmail =
+    /^[^\\s@?&#]+@[^\\s@?&#]+\\.[^\\s@?&#]+$/.test(emailCandidate)
+      ? emailCandidate
+      : null;
+
+  let linkedInUrl: string | null = null;
+
+  try {
+    const candidate = new URL(
+      process.env.PUBLIC_LINKEDIN_URL?.trim() ?? ""
+    );
+
+    if (
+      candidate.protocol === "https:" &&
+      ["www.linkedin.com", "linkedin.com"].includes(candidate.hostname) &&
+      /^\\/in\\/[^/]+\\/?$/.test(candidate.pathname)
+    ) {
+      linkedInUrl = candidate.toString();
+    }
+  } catch {
+    // LinkedIn is optional until a verified URL is configured.
+  }
+
   return (
     <section className="mb-14 lg:mb-16" aria-label="Ideas and proposals">
       <details className="group">
@@ -126,19 +151,44 @@ export default function IdeasAndProposals() {
                     will be able to reach me.
                   </p>
 
-                  <a
-                    href="https://github.com/dharmeshpriyadarshi"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 inline-block border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
-                  >
-                    GitHub profile {"\u2197"}
-                  </a>
+                  <div className="mt-6 flex flex-wrap gap-x-5 gap-y-4">
+                    {publicEmail && (
+                      <a
+                        href={`mailto:${publicEmail}?subject=${encodeURIComponent("Research Archive Inquiry")}`}
+                        className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                        aria-label="Send an email"
+                      >
+                        Email {"\\u2197"}
+                      </a>
+                    )}
 
-                  <p className="mt-5 text-xs text-gray-500">
-                    Direct messaging, email and LinkedIn will be
-                    configured before public release of this section.
-                  </p>
+                    {linkedInUrl && (
+                      <a
+                        href={linkedInUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                      >
+                        LinkedIn {"\\u2197"}
+                      </a>
+                    )}
+
+                    <a
+                      href="https://github.com/dharmeshpriyadarshi"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                    >
+                      GitHub {"\\u2197"}
+                    </a>
+                  </div>
+
+                  {(!publicEmail || !linkedInUrl) && (
+                    <p className="mt-5 text-xs text-gray-500">
+                      Additional contact channels will appear once
+                      their public details are configured.
+                    </p>
+                  )}
                 </div>
               </article>
             </div>
