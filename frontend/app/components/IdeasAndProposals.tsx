@@ -165,7 +165,7 @@ export default function IdeasAndProposals() {
                     {publicEmail && (
                       <a
                         href={`mailto:${publicEmail}?subject=${encodeURIComponent("Research Archive Inquiry")}`}
-                        className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                        className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-gray-100 hover:text-black hover:underline focus-visible:bg-gray-100 focus-visible:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
                         aria-label="Send an email"
                       >
                         Email {" ?"}
@@ -177,7 +177,7 @@ export default function IdeasAndProposals() {
                         href={linkedInUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                        className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-gray-100 hover:text-black hover:underline focus-visible:bg-gray-100 focus-visible:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
                       >
                         LinkedIn {" ?"}
                       </a>
@@ -187,7 +187,7 @@ export default function IdeasAndProposals() {
                       href="https://github.com/dharmeshpriyadarshi"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+                      className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-gray-100 hover:text-black hover:underline focus-visible:bg-gray-100 focus-visible:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
                     >
                       GitHub {" ?"}
                     </a>
