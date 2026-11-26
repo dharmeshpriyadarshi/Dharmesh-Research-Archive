@@ -12,7 +12,13 @@ import {
 
 const EDGE_TOLERANCE = 2;
 
-export default function ProjectCarousel({ children }: { children: ReactNode }) {
+export default function ProjectCarousel({
+  children,
+  label = "Academic projects",
+}: {
+  children: ReactNode;
+  label?: string;
+}) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const previousRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
@@ -116,7 +122,7 @@ export default function ProjectCarousel({ children }: { children: ReactNode }) {
         id={viewportId}
         className="horizontal-matrix project-matrix"
         role="region"
-        aria-label="Software projects; use arrow keys to browse"
+        aria-label={`${label}; use arrow keys to browse`}
         tabIndex={0}
         onScroll={updateEdges}
         onKeyDown={handleKeyDown}
