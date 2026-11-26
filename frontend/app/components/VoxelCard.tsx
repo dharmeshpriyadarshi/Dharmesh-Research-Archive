@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 
 interface ProjectMetric {
   id: number;
@@ -20,6 +20,14 @@ interface Project {
   metrics?: ProjectMetric[];
   components?: TechComponent[];
 }
+
+const PROJECT_PERIOD_LABELS: Record<string, string> = {
+  "ecosimulate": "2025",
+  "veridian-aqi": "Early 2026",
+  "dialect-align": "2026",
+  "studying-redhead": "Late 2026",
+  "on-top-of-spotify": "Late 2026",
+};
 
 export default function VoxelCard({ project }: { project: Project }) {
   const metrics = project.metrics ?? [];
@@ -45,9 +53,17 @@ export default function VoxelCard({ project }: { project: Project }) {
               RESEARCH / {project.slug.toUpperCase()}
             </span>
 
-            <span className="voxel-status">
-              {project.status}
-            </span>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {PROJECT_PERIOD_LABELS[project.slug] && (
+                <span className="border border-black bg-white px-2 py-1 font-mono text-[10px] uppercase tracking-wide">
+                  {PROJECT_PERIOD_LABELS[project.slug]}
+                </span>
+              )}
+
+              <span className="voxel-status">
+                {project.status}
+              </span>
+            </div>
           </div>
 
           <h3 className="voxel-title">{project.title}</h3>
