@@ -1,5 +1,5 @@
 {
-  "title": "ECOSIMULATE ? Environmental Modelling and Scientific Simulation",
+  "title": "EcoSimulate \u2014 Environmental Modelling and Scientific Simulation",
   "slug": "ecosimulate",
   "status": "Completed",
   "abstract": "A scientific software reconstruction based on environmental modelling research published at IEEE ICSCSA 2025. Features two deterministic mathematical simulation models, interactive geospatial experiments, regional statistical analysis, sensitivity visualizations and reproducible CSV/JSON exports. Supported by 146 automated tests and deployed through Vercel.",

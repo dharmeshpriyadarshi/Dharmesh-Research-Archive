@@ -63,11 +63,44 @@ async function getResearchPapers(): Promise<ResearchPaper[] | null> {
   }
 }
 
+const PROJECT_DISPLAY_ORDER: Record<string, number> = {
+  "ecosimulate": 0,
+  "veridian-aqi": 1,
+  "dialect-align": 2,
+  "studying-redhead": 3,
+  "on-top-of-spotify": 4,
+  "koshi-reach": 5,
+  "aerocausal": 6,
+  "aqua-sentinel": 7,
+};
+
+const PROJECT_STATUS_ORDER: Record<string, number> = {
+  "Completed": 0,
+  "In Progress": 1,
+  "Planned": 2,
+};
+
 export default async function PortfolioRoot() {
   const [projects, papers] = await Promise.all([
     getProjects(),
     getResearchPapers(),
   ]);
+
+  const orderedProjects = [...projects].sort((a, b) => {
+    const statusA = PROJECT_STATUS_ORDER[a.status] ?? 3;
+    const statusB = PROJECT_STATUS_ORDER[b.status] ?? 3;
+
+    if (statusA !== statusB) {
+      return statusA - statusB;
+    }
+
+    const rankA =
+      PROJECT_DISPLAY_ORDER[a.slug] ?? Number.MAX_SAFE_INTEGER;
+    const rankB =
+      PROJECT_DISPLAY_ORDER[b.slug] ?? Number.MAX_SAFE_INTEGER;
+
+    return rankA - rankB || a.title.localeCompare(b.title);
+  });
 
   const skills = Array.from(
     new Map(
@@ -119,7 +152,7 @@ export default async function PortfolioRoot() {
           </p>
         ) : (
           <ProjectCarousel>
-            {projects.map((project) => (
+            {orderedProjects.map((project) => (
               <div className="snap-voxel" key={project.id}>
                 <VoxelCard project={project} />
               </div>
