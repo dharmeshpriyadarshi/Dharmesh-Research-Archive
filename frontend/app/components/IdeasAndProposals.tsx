@@ -31,10 +31,11 @@ const PROPOSALS: Proposal[] = [
 ];
 
 export default function IdeasAndProposals() {
-  const emailCandidate = process.env.PUBLIC_CONTACT_EMAIL?.trim() ?? "";
+  const emailCandidate =
+    process.env.PUBLIC_CONTACT_EMAIL?.trim() ?? "";
 
   const publicEmail =
-    /^[^\\s@?&#]+@[^\\s@?&#]+\\.[^\\s@?&#]+$/.test(emailCandidate)
+    /^[^\s@?&#]+@[^\s@?&#]+\.[^\s@?&#]+$/.test(emailCandidate)
       ? emailCandidate
       : null;
 
@@ -45,15 +46,24 @@ export default function IdeasAndProposals() {
       process.env.PUBLIC_LINKEDIN_URL?.trim() ?? ""
     );
 
+    const host = candidate.hostname.toLowerCase();
+    const segments = candidate.pathname.split("/").filter(Boolean);
+
     if (
       candidate.protocol === "https:" &&
-      ["www.linkedin.com", "linkedin.com"].includes(candidate.hostname) &&
-      /^\\/in\\/[^/]+\\/?$/.test(candidate.pathname)
+      (host === "linkedin.com" || host === "www.linkedin.com") &&
+      segments.length === 2 &&
+      segments[0] === "in" &&
+      /^[A-Za-z0-9._%-]+$/.test(segments[1]) &&
+      candidate.username === "" &&
+      candidate.password === ""
     ) {
+      candidate.search = "";
+      candidate.hash = "";
       linkedInUrl = candidate.toString();
     }
   } catch {
-    // LinkedIn is optional until a verified URL is configured.
+    // LinkedIn is optional until a valid public URL is configured.
   }
 
   return (
@@ -158,7 +168,7 @@ export default function IdeasAndProposals() {
                         className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
                         aria-label="Send an email"
                       >
-                        Email {"\\u2197"}
+                        Email {" ?"}
                       </a>
                     )}
 
@@ -169,7 +179,7 @@ export default function IdeasAndProposals() {
                         rel="noopener noreferrer"
                         className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
                       >
-                        LinkedIn {"\\u2197"}
+                        LinkedIn {" ?"}
                       </a>
                     )}
 
@@ -179,7 +189,7 @@ export default function IdeasAndProposals() {
                       rel="noopener noreferrer"
                       className="border-b-2 border-black font-mono text-sm font-semibold hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
                     >
-                      GitHub {"\\u2197"}
+                      GitHub {" ?"}
                     </a>
                   </div>
 
