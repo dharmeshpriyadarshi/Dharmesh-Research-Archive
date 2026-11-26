@@ -69,10 +69,12 @@ const PROJECT_DISPLAY_ORDER: Record<string, number> = {
   "veridian-aqi": 1,
   "dialect-align": 2,
   "studying-redhead": 3,
-  "on-top-of-spotify": 4,
-  "koshi-reach": 5,
-  "aerocausal": 6,
-  "aqua-sentinel": 7,
+  "brackets": 4,
+  "on-top-of-spotify": 5,
+  "koshi-reach": 6,
+  "aerocausal": 7,
+  "aqua-sentinel": 8,
+  "digital-twin": 9,
 };
 
 const PROJECT_STATUS_ORDER: Record<string, number> = {

@@ -27,6 +27,8 @@ const PROJECT_PERIOD_LABELS: Record<string, string> = {
   "dialect-align": "2026",
   "studying-redhead": "Late 2026",
   "on-top-of-spotify": "Late 2026",
+  "brackets": "2026",
+  "digital-twin": "Proposed 2026",
 };
 
 export default function VoxelCard({
