@@ -3,13 +3,32 @@ import ProjectCarousel from "./ProjectCarousel";
 interface Proposal {
   slug: string;
   title: string;
+  tagline: string;
   problem: string;
   approach: string;
 }
 
 // Intentionally empty until proposals have been reviewed.
 // These are editorial concepts, not completed software projects.
-const PROPOSALS: Proposal[] = [];
+const PROPOSALS: Proposal[] = [
+  {
+    slug: "blame-game",
+    title: "BlameGame",
+    tagline: "Stop passing blame. Start tracing responsibility.",
+    problem:
+      "Public infrastructure priorities can be difficult to reconcile " +
+      "with verified local needs. Citizens may lack a clear way to trace " +
+      "how reported problems, funding decisions, responsible authorities " +
+      "and completed public works are connected.",
+    approach:
+      "A proposed government-integrated accountability platform linking " +
+      "geotagged citizen reports, infrastructure need assessments, " +
+      "documented public expenditure and project outcomes. A district-level " +
+      "Civic Accountability Liaison would route grievances to responsible " +
+      "authorities and track their responses without replacing official " +
+      "budgetary or administrative powers.",
+  },
+];
 
 export default function IdeasAndProposals() {
   return (
@@ -53,6 +72,9 @@ export default function IdeasAndProposals() {
                       IDEA / {proposal.slug.toUpperCase()}
                     </span>
                     <h3 className="voxel-title">{proposal.title}</h3>
+                    <p className="mt-2 font-mono text-xs text-gray-600">
+                      {proposal.tagline}
+                    </p>
                     <p className="mt-4 text-sm text-gray-700">
                       <strong>Problem:</strong> {proposal.problem}
                     </p>
