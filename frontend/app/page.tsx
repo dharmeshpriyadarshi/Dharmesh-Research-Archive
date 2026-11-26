@@ -2,6 +2,7 @@ import ProjectCarousel from "./components/ProjectCarousel";
 
 import VoxelCard from "./components/VoxelCard";
 import ResearchPaperCard from "./components/ResearchPaperCard";
+import IdeasAndProposals from "./components/IdeasAndProposals";
 import type { ResearchPaper } from "./types/publication";
 
 interface TechComponent {
@@ -68,10 +69,12 @@ const PROJECT_DISPLAY_ORDER: Record<string, number> = {
   "veridian-aqi": 1,
   "dialect-align": 2,
   "studying-redhead": 3,
-  "on-top-of-spotify": 4,
-  "koshi-reach": 5,
-  "aerocausal": 6,
-  "aqua-sentinel": 7,
+  "brackets": 4,
+  "on-top-of-spotify": 5,
+  "koshi-reach": 6,
+  "aerocausal": 7,
+  "aqua-sentinel": 8,
+  "digital-twin": 9,
 };
 
 const PROJECT_STATUS_ORDER: Record<string, number> = {
@@ -79,6 +82,12 @@ const PROJECT_STATUS_ORDER: Record<string, number> = {
   "In Progress": 1,
   "Planned": 2,
 };
+
+const PERSONAL_PROJECT_SLUGS = new Set([
+  "on-top-of-spotify",
+  "brackets",
+  "digital-twin",
+]);
 
 export default async function PortfolioRoot() {
   const [projects, papers] = await Promise.all([
@@ -101,6 +110,14 @@ export default async function PortfolioRoot() {
 
     return rankA - rankB || a.title.localeCompare(b.title);
   });
+
+  const academicProjects = orderedProjects.filter(
+    (project) => !PERSONAL_PROJECT_SLUGS.has(project.slug)
+  );
+
+  const personalProjects = orderedProjects.filter(
+    (project) => PERSONAL_PROJECT_SLUGS.has(project.slug)
+  );
 
   const skills = Array.from(
     new Map(
@@ -138,23 +155,52 @@ export default async function PortfolioRoot() {
       <section className="mb-14 lg:mb-16">
         <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
           <h2 className="text-xl uppercase tracking-wide">
-            Software Projects
+            Academic Projects
           </h2>
 
           <span className="font-mono text-xs">
-            {projects.length.toString().padStart(2, "0")} ENTRIES
+            {academicProjects.length.toString().padStart(2, "0")} ENTRIES
           </span>
         </div>
 
-        {projects.length === 0 ? (
+        {academicProjects.length === 0 ? (
           <p className="py-8 text-gray-600">
-            No software projects currently indexed.
+            No academic projects currently indexed.
           </p>
         ) : (
-          <ProjectCarousel>
-            {orderedProjects.map((project) => (
+          <ProjectCarousel label="Academic projects">
+            {academicProjects.map((project) => (
               <div className="snap-voxel" key={project.id}>
                 <VoxelCard project={project} />
+              </div>
+            ))}
+          </ProjectCarousel>
+        )}
+      </section>
+
+      <section className="mb-14 lg:mb-16">
+        <div className="mb-8 flex items-baseline justify-between border-b border-black pb-3">
+          <h2 className="text-xl uppercase tracking-wide">
+            Personal Projects
+          </h2>
+
+          <span className="font-mono text-xs">
+            {personalProjects.length.toString().padStart(2, "0")} ENTRIES
+          </span>
+        </div>
+
+        {personalProjects.length === 0 ? (
+          <p className="py-8 text-gray-600">
+            No personal projects currently indexed.
+          </p>
+        ) : (
+          <ProjectCarousel label="Personal projects">
+            {personalProjects.map((project) => (
+              <div className="snap-voxel" key={project.id}>
+                <VoxelCard
+                  project={project}
+                  category="personal"
+                />
               </div>
             ))}
           </ProjectCarousel>
@@ -219,6 +265,8 @@ export default async function PortfolioRoot() {
           </div>
         )}
       </section>
+
+      <IdeasAndProposals />
 
       <footer className="mt-16 border-t-2 border-black pt-5 font-mono text-xs text-gray-500">
         <p>DHARMESH PRIYADARSHI - RESEARCH ARCHIVE</p>

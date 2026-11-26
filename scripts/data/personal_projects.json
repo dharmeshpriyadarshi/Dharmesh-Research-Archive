@@ -1,0 +1,51 @@
+[
+  {
+    "slug": "brackets",
+    "title": "Brackets: Context-Centric Social Threading Platform",
+    "status": "In Progress",
+    "repository_url": "https://github.com/dharmeshpriyadarshi/brackets",
+    "abstract": "A mobile social application built with React Native, Expo and Supabase that organizes related content into topic-based brackets containing ordered, horizontally navigable spaces. The current prototype supports authentication, bracket creation, public/private visibility, feed retrieval and creator-follow functionality.",
+    "content": "## Project Overview\n\nBrackets explores a context-centric model of social content organization.\n\nInstead of treating each post as an isolated unit, the application groups related information into brackets containing ordered content spaces.\n\n## Implemented Development\n\n- React Native and Expo application architecture with TypeScript.\n- Expo Router navigation and Android testing.\n- NativeWind-based interface development.\n- Supabase authentication and session persistence.\n- PostgreSQL tables for brackets and their content spaces.\n- Row-level security policies for protected data access.\n- Animated bracket creation with public/private visibility.\n- Dynamic feed retrieval and pull-to-refresh.\n- Horizontal navigation between ordered bracket spaces.\n- Creator-follow database relationships and application integration.\n\n## Architecture\n\nThe application uses React Native and Expo for the mobile client, Supabase Auth for authentication, and Supabase PostgreSQL for persistence.\n\nBrackets and bracket spaces are represented as related database records. Follow relationships use separate relational tables with duplicate-prevention constraints and access-control policies.\n\n## Current Limitations\n\nDevelopment remains ongoing.\n\nFollowing an individual bracket was being implemented but had not been successfully verified in the supplied development transcript.\n\nA public production release, comprehensive security assessment, and complete social feed functionality are not claimed.\n\n## Source Code\n\n[Brackets GitHub repository](https://github.com/dharmeshpriyadarshi/brackets)\n",
+    "components": [
+      {
+        "name": "TypeScript",
+        "category": "Language"
+      },
+      {
+        "name": "React Native",
+        "category": "Framework"
+      },
+      {
+        "name": "Expo",
+        "category": "Framework"
+      },
+      {
+        "name": "Expo Router",
+        "category": "Framework"
+      },
+      {
+        "name": "Supabase",
+        "category": "Infrastructure"
+      },
+      {
+        "name": "PostgreSQL",
+        "category": "Database"
+      },
+      {
+        "name": "NativeWind",
+        "category": "Framework"
+      }
+    ],
+    "metrics": []
+  },
+  {
+    "slug": "digital-twin",
+    "title": "DigitalTwin: Ontological Personalization and Graph-Based AI Memory",
+    "status": "Planned",
+    "repository_url": null,
+    "abstract": "A proposed data-engineering system for modelling evolving human preferences as a weighted, temporal knowledge graph. The planned architecture combines consent-based preference ingestion, asynchronous entity resolution, graph traversal and retrieval-augmented generation for contextual AI personalization.",
+    "content": "## Project Vision\n\nDigitalTwin proposes a knowledge-graph-based approach to modelling human preferences as evolving relationships rather than static tags.\n\n## Research and Engineering Problem\n\nFlat preference records do not directly express complex relationships between entities, abstract concepts and situational contexts.\n\nThe proposed system investigates how temporal and contextual graph representations could support more precise retrieval for personalized AI systems.\n\n## Proposed Architecture\n\n### Ontological Graph Layer\n\nRepresent users, concrete entities, abstract concepts and situational contexts as nodes connected by weighted and timestamped relationships.\n\nCandidate graph database: Neo4j.\n\n### Asynchronous Ingestion Layer\n\nDefine validated preference events using FastAPI and Pydantic.\n\nQueue accepted events for background processing with Celery and Redis. Workers would resolve entities and update relationships through idempotent graph operations.\n\n### Graph-to-RAG Pipeline\n\nExtract bounded user-centric subgraphs, serialize relationships into semantic statements and embed them for retrieval.\n\nCandidate technologies include sentence-transformer embeddings, Neo4j vector indexes and alternative vector stores.\n\n## Planned Development Phases\n\n1. Infrastructure and ontology schema.\n2. Preference-event ingestion API.\n3. Background graph mutation and entity resolution.\n4. Subgraph extraction, embeddings and retrieval.\n5. Testing, containerization and verification.\n\n## Privacy and Scientific Limitations\n\nThe design will require explicit user consent, appropriate access controls, data deletion mechanisms, and safeguards against unsupported preference inference.\n\nGraph-based retrieval does not independently guarantee factual personalization or eliminate LLM hallucinations.\n\n## Current Status\n\nThis is an architectural proposal. No implemented ingestion pipeline, operational knowledge graph, trained model, or validated RAG system is claimed.\n",
+    "components": [],
+    "metrics": []
+  }
+]
