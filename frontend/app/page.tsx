@@ -2,6 +2,7 @@ import ProjectCarousel from "./components/ProjectCarousel";
 
 import VoxelCard from "./components/VoxelCard";
 import ResearchPaperCard from "./components/ResearchPaperCard";
+import IdeasAndProposals from "./components/IdeasAndProposals";
 import type { ResearchPaper } from "./types/publication";
 
 interface TechComponent {
@@ -262,6 +263,8 @@ export default async function PortfolioRoot() {
           </div>
         )}
       </section>
+
+      <IdeasAndProposals />
 
       <footer className="mt-16 border-t-2 border-black pt-5 font-mono text-xs text-gray-500">
         <p>DHARMESH PRIYADARSHI - RESEARCH ARCHIVE</p>
