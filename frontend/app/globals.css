@@ -814,3 +814,30 @@ body:has(.research-page:not(.archive-publication-page)) {
     overflow-x: auto;
   }
 }
+
+/* Task 18.2: Research content link styling */
+.research-content a[href] {
+  color: #111827;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.research-content a[href]:hover {
+  background-color: #111827;
+  color: #ffffff;
+}
+
+.research-content a[href]:focus-visible {
+  outline: 2px solid #111827;
+  outline-offset: 4px;
+}
+
+.research-content a[href^="https://"]::after,
+.research-content a[href^="http://"]::after {
+  content: " ?";
+  font-size: 0.85em;
+}
