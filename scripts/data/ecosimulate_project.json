@@ -1,0 +1,58 @@
+{
+  "title": "ECOSIMULATE ? Environmental Modelling and Scientific Simulation",
+  "slug": "ecosimulate",
+  "status": "Completed",
+  "abstract": "A scientific software reconstruction based on environmental modelling research published at IEEE ICSCSA 2025. Features two deterministic mathematical simulation models, interactive geospatial experiments, regional statistical analysis, sensitivity visualizations and reproducible CSV/JSON exports. Supported by 146 automated tests and deployed through Vercel.",
+  "repository_url": "https://github.com/dharmeshpriyadarshi/EcoSimulate-Reconstruction",
+  "content": "## Project Overview\n\nECOSIMULATE is an interactive research software application reconstructed in November 2026 from environmental modelling research published at IEEE ICSCSA 2025.\n\nThe reconstruction modernizes the original software through React and TypeScript, modular mathematical engines, spatial experimentation, scientific analytics and reproducible exports.\n\n## Research Foundation\n\nThe original research examined hypothetical pollution mitigation scenarios using environmental inputs and artificial-tree interventions.\n\nThe 2026 reconstruction is a software engineering continuation of that research, not a separate peer-reviewed publication.\n\n**Original publication:** [IEEE ICSCSA 2025](https://doi.org/10.1109/ICSCSA66339.2025.11170787)\n\n## Mathematical Simulation\n\n### Published Pollution Index Reconstruction\n\nThe first model reconstructs a weighted Pollution Index using temperature, PM2.5, carbon monoxide and hypothetical artificial-tree deployment. Results are bounded between 0 and 100.\n\nThe index is a custom research calculation, not official AQI.\n\n### Illustrative PM2.5 Response Model\n\nThe second model uses an exponential intervention-response function with configurable geographical area, filtration units and intervention intensity.\n\nIts coefficients are illustrative and have not been empirically calibrated.\n\nNeither simulator implements a trained machine learning model.\n\n## Geospatial Experimentation\n\n- Seven reference study locations in India.\n- Fixed 7-by-7 geographical grids with 49 cells per region.\n- Adaptive grids based on estimated map ground resolution.\n- Cell, row, column and entire-region intervention controls.\n- Region locking and scenario overwrite protection.\n\n## Scientific Analytics and Reproducibility\n\nThe application computes descriptive regional statistics, baseline/intervention comparisons and deployment sensitivity visualizations.\n\nExperiments can be exported in CSV and JSON formats with numerical results, spatial configuration and scientific limitations.\n\n## Engineering and Quality Assurance\n\n- React, TypeScript, Vite and React Router frontend.\n- Leaflet and React Leaflet for geospatial interfaces.\n- Recharts for analytical visualizations.\n- 146 passing automated application-logic tests across nine suites.\n- A 70.9% reduction in initial JavaScript bundle size through code splitting and deferred analytical loading.\n- GitHub Actions continuous integration and Vercel deployment.\n\n## Scientific Limitations\n\nThe application explores hypothetical deterministic environmental scenarios. It does not provide live monitoring, physically calibrated pollutant predictions or evidence of real-world intervention effectiveness.\n\n## Project Resources\n\n**[Launch the live ECOSIMULATE application](https://ecosimulate-reconstruction.vercel.app/)**\n\n**[View reconstructed source code](https://github.com/dharmeshpriyadarshi/EcoSimulate-Reconstruction)**\n\n**[Read the original IEEE research publication](https://doi.org/10.1109/ICSCSA66339.2025.11170787)**\n\n**[Historical software repository](https://github.com/dharmeshpriyadarshi/EcoSimulate)**\n",
+  "components": [
+    {
+      "name": "React",
+      "category": "Framework"
+    },
+    {
+      "name": "TypeScript",
+      "category": "Language"
+    },
+    {
+      "name": "Leaflet",
+      "category": "Framework"
+    },
+    {
+      "name": "Vitest",
+      "category": "Framework"
+    },
+    {
+      "name": "Recharts",
+      "category": "Framework"
+    },
+    {
+      "name": "Vite",
+      "category": "Infrastructure"
+    },
+    {
+      "name": "GitHub Actions",
+      "category": "Infrastructure"
+    },
+    {
+      "name": "Vercel",
+      "category": "Infrastructure"
+    }
+  ],
+  "metrics": [
+    {
+      "metric_type": "Automated_Tests",
+      "metric_data": {
+        "passed": 146,
+        "total": 146,
+        "suites": 9
+      }
+    },
+    {
+      "metric_type": "Initial_JS_Bundle_Reduction",
+      "metric_data": {
+        "percent": 70.9
+      }
+    }
+  ]
+}
