@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
+import StevePlacement from "./StevePlacement";
 import {
   Bounds,
   Center,
@@ -192,17 +193,9 @@ export default function WorldCanvas({
 
       {orientation === "source" && selected && (
         <group position={selected.world}>
-          {/* Diagnostic standing envelope, not a player collider. */}
-          <mesh position={[0, 0.9, 0]}>
-            <boxGeometry args={[0.6, 1.8, 0.6]} />
-            <meshBasicMaterial
-              color="#facc15"
-              transparent
-              opacity={0.35}
-              depthTest={false}
-              depthWrite={false}
-            />
-          </mesh>
+          <Suspense fallback={null}>
+            <StevePlacement />
+          </Suspense>
 
           {/* Footprint at the selected terrain surface. */}
           <mesh
