@@ -848,6 +848,19 @@ body:has(.steve-page) {
   animation: archive-mode-switch-enter 240ms ease-out both;
 }
 
+/* Keep the archive-to-Steve route switch readable on interaction. */
+a.archive-mode-switch[href="/steve"]:hover,
+a.archive-mode-switch[href="/steve"]:focus-visible {
+  color: #ffffff;
+  background-color: #0a0a0a;
+  border-color: #0a0a0a;
+}
+
+a.archive-mode-switch[href="/steve"]:hover > span,
+a.archive-mode-switch[href="/steve"]:focus-visible > span {
+  color: inherit;
+}
+
 /* Maintain readable headings in the dark experience. */
 .steve-page h1,
 .steve-page h2 {

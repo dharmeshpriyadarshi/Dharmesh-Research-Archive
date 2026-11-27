@@ -36,8 +36,10 @@ const CUTOUT_MATERIAL_NAMES = new Set([
 
 function WorldModel({
   onReady,
+  orientation,
 }: {
   onReady: () => void;
+  orientation: "source" | "upright";
 }) {
   const { scene } = useGLTF(WORLD_URL);
 
@@ -86,15 +88,25 @@ function WorldModel({
 
   return (
     <Center>
-      <primitive object={instance} />
+      <group
+        rotation={
+          orientation === "upright"
+            ? [Math.PI / 2, 0, 0]
+            : [0, 0, 0]
+        }
+      >
+        <primitive object={instance} />
+      </group>
     </Center>
   );
 }
 
 export default function WorldCanvas({
   onReady,
+  orientation,
 }: {
   onReady: () => void;
+  orientation: "source" | "upright";
 }) {
   return (
     <Canvas
@@ -125,8 +137,17 @@ export default function WorldCanvas({
       />
 
       <Suspense fallback={null}>
-        <Bounds fit clip observe margin={1.25}>
-          <WorldModel onReady={onReady} />
+        <Bounds
+          key={orientation}
+          fit
+          clip
+          observe
+          margin={1.25}
+        >
+          <WorldModel
+            onReady={onReady}
+            orientation={orientation}
+          />
         </Bounds>
       </Suspense>
     </Canvas>

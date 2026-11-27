@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
@@ -19,6 +19,9 @@ export default function WorldPreview() {
   const [entered, setEntered] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
+  const [orientation, setOrientation] = useState<
+    "source" | "upright"
+  >("source");
 
   const onReady = useCallback(() => {
     setReady(true);
@@ -72,7 +75,42 @@ export default function WorldPreview() {
         </div>
       ) : (
         <div className="relative h-[65vh] min-h-[460px] w-full">
-          <WorldCanvas onReady={onReady} />
+          <WorldCanvas
+            onReady={onReady}
+            orientation={orientation}
+          />
+
+          <div
+            role="group"
+            aria-label="World orientation comparison"
+            className="absolute left-3 top-3 z-10 flex gap-2 border border-neutral-500 bg-black/90 p-2"
+          >
+            <button
+              type="button"
+              aria-pressed={orientation === "source"}
+              onClick={() => setOrientation("source")}
+              className={
+                orientation === "source"
+                  ? "min-h-11 border border-white bg-white px-3 font-mono text-xs text-black"
+                  : "min-h-11 border border-neutral-500 px-3 font-mono text-xs text-white hover:bg-neutral-700 focus-visible:bg-neutral-700"
+              }
+            >
+              Source Axes
+            </button>
+
+            <button
+              type="button"
+              aria-pressed={orientation === "upright"}
+              onClick={() => setOrientation("upright")}
+              className={
+                orientation === "upright"
+                  ? "min-h-11 border border-white bg-white px-3 font-mono text-xs text-black"
+                  : "min-h-11 border border-neutral-500 px-3 font-mono text-xs text-white hover:bg-neutral-700 focus-visible:bg-neutral-700"
+              }
+            >
+              Upright Test
+            </button>
+          </div>
 
           {!ready && (
             <div
@@ -84,7 +122,14 @@ export default function WorldPreview() {
           )}
 
           <div className="pointer-events-none absolute bottom-3 left-3 bg-black/80 px-3 py-2 font-mono text-xs text-white">
-            Drag: rotate | Scroll: zoom | Right-drag: pan
+            <span className="block">
+              Drag: rotate | Scroll: zoom | Right-drag: pan
+            </span>
+            <span className="mt-1 block text-neutral-300">
+              {orientation === "source"
+                ? "GLB source orientation"
+                : "Experimental +90 degree X-axis rotation"}
+            </span>
           </div>
 
           <button
