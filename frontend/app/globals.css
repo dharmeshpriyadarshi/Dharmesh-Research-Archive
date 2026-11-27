@@ -861,6 +861,19 @@ a.archive-mode-switch[href="/steve"]:focus-visible > span {
   color: inherit;
 }
 
+/* Readable Steve-to-Archive navigation on hover and focus. */
+.steve-page a.archive-mode-switch[href="/"]:hover,
+.steve-page a.archive-mode-switch[href="/"]:focus-visible {
+  color: #0a0a0a;
+  background-color: #e5e5e5;
+  border-color: #e5e5e5;
+}
+
+.steve-page a.archive-mode-switch[href="/"]:hover > span,
+.steve-page a.archive-mode-switch[href="/"]:focus-visible > span {
+  color: inherit;
+}
+
 /* Maintain readable headings in the dark experience. */
 .steve-page h1,
 .steve-page h2 {
