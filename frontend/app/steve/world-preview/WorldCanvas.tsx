@@ -191,19 +191,33 @@ export default function WorldCanvas({
       </Suspense>
 
       {orientation === "source" && selected && (
-        <mesh
-          position={[
-            selected.world[0],
-            selected.world[1] + 0.4,
-            selected.world[2],
-          ]}
-        >
-          <sphereGeometry args={[0.4, 16, 12]} />
-          <meshBasicMaterial
-            color="#facc15"
-            depthTest={false}
-          />
-        </mesh>
+        <group position={selected.world}>
+          {/* Diagnostic standing envelope, not a player collider. */}
+          <mesh position={[0, 0.9, 0]}>
+            <boxGeometry args={[0.6, 1.8, 0.6]} />
+            <meshBasicMaterial
+              color="#facc15"
+              transparent
+              opacity={0.35}
+              depthTest={false}
+              depthWrite={false}
+            />
+          </mesh>
+
+          {/* Footprint at the selected terrain surface. */}
+          <mesh
+            rotation={[-Math.PI / 2, 0, 0]}
+            position={[0, 0.04, 0]}
+          >
+            <ringGeometry args={[0.36, 0.46, 32]} />
+            <meshBasicMaterial
+              color="#facc15"
+              side={THREE.DoubleSide}
+              depthTest={false}
+              depthWrite={false}
+            />
+          </mesh>
+        </group>
       )}
     </Canvas>
   );
