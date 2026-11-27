@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import {
   Bounds,
@@ -11,6 +11,12 @@ import {
 } from "@react-three/drei";
 
 const WORLD_URL = "/models/soulwitchs-world.glb";
+
+export type SurfaceSample = {
+  world: [number, number, number];
+  source: [number, number, number];
+  mesh: string;
+};
 
 // Confirmed material names from the exported GLB.
 // Keep glass, doors, and other materials unchanged.
@@ -37,9 +43,11 @@ const CUTOUT_MATERIAL_NAMES = new Set([
 function WorldModel({
   onReady,
   orientation,
+  onSurfaceSample,
 }: {
   onReady: () => void;
   orientation: "source" | "upright";
+  onSurfaceSample: (sample: SurfaceSample) => void;
 }) {
   const { scene } = useGLTF(WORLD_URL);
 
@@ -95,7 +103,33 @@ function WorldModel({
             : [0, 0, 0]
         }
       >
-        <primitive object={instance} />
+        <primitive
+          object={instance}
+          onClick={(event: ThreeEvent<MouseEvent>) => {
+            if (
+              orientation !== "source" ||
+              !event.nativeEvent.shiftKey
+            ) {
+              return;
+            }
+
+            event.stopPropagation();
+
+            const source = instance.worldToLocal(
+              event.point.clone()
+            );
+
+            onSurfaceSample({
+              world: [
+                event.point.x,
+                event.point.y,
+                event.point.z,
+              ],
+              source: [source.x, source.y, source.z],
+              mesh: event.object.name || "Unnamed mesh",
+            });
+          }}
+        />
       </group>
     </Center>
   );
@@ -104,9 +138,13 @@ function WorldModel({
 export default function WorldCanvas({
   onReady,
   orientation,
+  onSurfaceSample,
+  selected,
 }: {
   onReady: () => void;
   orientation: "source" | "upright";
+  onSurfaceSample: (sample: SurfaceSample) => void;
+  selected: SurfaceSample | null;
 }) {
   return (
     <Canvas
@@ -147,9 +185,26 @@ export default function WorldCanvas({
           <WorldModel
             onReady={onReady}
             orientation={orientation}
+            onSurfaceSample={onSurfaceSample}
           />
         </Bounds>
       </Suspense>
+
+      {orientation === "source" && selected && (
+        <mesh
+          position={[
+            selected.world[0],
+            selected.world[1] + 0.4,
+            selected.world[2],
+          ]}
+        >
+          <sphereGeometry args={[0.4, 16, 12]} />
+          <meshBasicMaterial
+            color="#facc15"
+            depthTest={false}
+          />
+        </mesh>
+      )}
     </Canvas>
   );
 }

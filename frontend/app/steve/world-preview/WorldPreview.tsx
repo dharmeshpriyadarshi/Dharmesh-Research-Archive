@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
+import type { SurfaceSample } from "./WorldCanvas";
 
 const WorldCanvas = dynamic(() => import("./WorldCanvas"), {
   ssr: false,
@@ -22,6 +23,8 @@ export default function WorldPreview() {
   const [orientation, setOrientation] = useState<
     "source" | "upright"
   >("source");
+  const [surfaceSample, setSurfaceSample] =
+    useState<SurfaceSample | null>(null);
 
   const onReady = useCallback(() => {
     setReady(true);
@@ -78,6 +81,8 @@ export default function WorldPreview() {
           <WorldCanvas
             onReady={onReady}
             orientation={orientation}
+            onSurfaceSample={setSurfaceSample}
+            selected={surfaceSample}
           />
 
           <div
@@ -88,7 +93,10 @@ export default function WorldPreview() {
             <button
               type="button"
               aria-pressed={orientation === "source"}
-              onClick={() => setOrientation("source")}
+              onClick={() => {
+                setOrientation("source");
+                setSurfaceSample(null);
+              }}
               className={
                 orientation === "source"
                   ? "min-h-11 border border-white bg-white px-3 font-mono text-xs text-black"
@@ -101,7 +109,10 @@ export default function WorldPreview() {
             <button
               type="button"
               aria-pressed={orientation === "upright"}
-              onClick={() => setOrientation("upright")}
+              onClick={() => {
+                setOrientation("upright");
+                setSurfaceSample(null);
+              }}
               className={
                 orientation === "upright"
                   ? "min-h-11 border border-white bg-white px-3 font-mono text-xs text-black"
@@ -120,6 +131,38 @@ export default function WorldPreview() {
               Loading world geometry and textures...
             </div>
           )}
+
+          <div
+            role="status"
+            aria-live="polite"
+            className="pointer-events-none absolute bottom-3 right-3 max-w-[min(90%,360px)] border border-neutral-600 bg-black/90 p-3 font-mono text-xs leading-relaxed text-white"
+          >
+            <p className="mb-1 font-bold">
+              Surface Inspector
+            </p>
+
+            {orientation !== "source" ? (
+              <p>Switch to Source Axes to sample.</p>
+            ) : surfaceSample ? (
+              <>
+                <p>
+                  Preview XYZ:{" "}
+                  {surfaceSample.world
+                    .map((value) => value.toFixed(2))
+                    .join(", ")}
+                </p>
+                <p>
+                  GLB-local XYZ:{" "}
+                  {surfaceSample.source
+                    .map((value) => value.toFixed(2))
+                    .join(", ")}
+                </p>
+                <p>Mesh: {surfaceSample.mesh}</p>
+              </>
+            ) : (
+              <p>Shift + click a flat patch of ground.</p>
+            )}
+          </div>
 
           <div className="pointer-events-none absolute bottom-3 left-3 bg-black/80 px-3 py-2 font-mono text-xs text-white">
             <span className="block">
